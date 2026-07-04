@@ -1,5 +1,9 @@
 import Inventory from '@/features/inventory/Inventory'
+import ProductPreview from '@/features/inventory/ProductPreview'
 import Dashboard from '../features/dashboard/Dashboard'
+import Categories from '@/features/categories/Categories'
+import Orders from '@/features/orders/Orders'
+import OrderPreview from '@/features/orders/OrderPreview'
 
 export const routes = [
     {
@@ -11,8 +15,16 @@ export const routes = [
         element: <Inventory />,
     },
     {
+        path: '/inventory/:id',
+        element: <ProductPreview />,
+    },
+    {
         path: '/orders',
-        element: <div>Orders</div>,
+        element: <Orders />,
+    },
+    {
+        path: '/orders/:id',
+        element: <OrderPreview />,
     },
     {
         path: '/customers',
@@ -24,7 +36,7 @@ export const routes = [
     },
     {
         path: '/categories',
-        element: <div>Categories</div>,
+        element: <Categories />,
     },
     {
         path: '/reports',
