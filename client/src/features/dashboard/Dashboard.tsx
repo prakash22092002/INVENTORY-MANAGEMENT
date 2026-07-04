@@ -28,6 +28,8 @@ import {
     ResponsiveContainer,
     Area,
     AreaChart,
+    BarChart,
+    Bar,
 } from 'recharts'
 
 const statCardsData = [
@@ -145,12 +147,36 @@ const summaryItems = [
     { label: 'Avg. Order Value', value: '$52.40', icon: Wallet, iconColor: 'text-violet-500 dark:text-violet-400' },
 ]
 
+const topProducts = [
+    { rank: 1, name: 'Wireless Mouse', category: 'Peripherals', units: 1240, revenue: '$24,800' },
+    { rank: 2, name: 'Mechanical Keyboard', category: 'Peripherals', units: 890, revenue: '$53,400' },
+    { rank: 3, name: 'USB-C Hub', category: 'Accessories', units: 654, revenue: '$29,430' },
+    { rank: 4, name: '27" Monitor', category: 'Electronics', units: 432, revenue: '$150,768' },
+    { rank: 5, name: 'Webcam HD', category: 'Electronics', units: 387, revenue: '$23,181' },
+]
+
+const categoryDistribution = [
+    { name: 'Electronics', products: 45, value: 45 },
+    { name: 'Accessories', products: 32, value: 32 },
+    { name: 'Peripherals', products: 28, value: 28 },
+    { name: 'Cables', products: 18, value: 18 },
+    { name: 'Storage', products: 15, value: 15 },
+]
+
+const stockAlerts = [
+    { product: 'Wireless Mouse', sku: 'WM-001', quantity: 5, threshold: 20 },
+    { product: 'USB-C Cable 2m', sku: 'UC-012', quantity: 3, threshold: 30 },
+    { product: 'HDMI Adapter', sku: 'HD-008', quantity: 2, threshold: 15 },
+    { product: 'Mouse Pad XL', sku: 'MP-022', quantity: 8, threshold: 25 },
+    { product: 'Bluetooth Speaker', sku: 'BS-005', quantity: 4, threshold: 10 },
+]
+
 const Dashboard = () => {
     return (
         <div className="dashboard flex flex-col gap-6">
             <div className="dashboard-header flex flex-col gap-1">
                 <h1 className="dashboard-header-title text-2xl font-semibold tracking-tight sm:text-3xl">
-                    Dashboard
+                    Prakash Paudel
                 </h1>
                 <p className="dashboard-header-subtitle text-sm text-muted-foreground">
                     Welcome back, Prakash.
@@ -289,6 +315,122 @@ const Dashboard = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            <div className="dashboard-insights-grid grid grid-cols-1 gap-3 lg:grid-cols-2">
+                <Card className="dashboard-top-products border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                    <CardHeader className="dashboard-top-products-header">
+                        <CardTitle className="dashboard-top-products-title text-sm font-semibold">
+                            Top Selling Products
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="dashboard-top-products-body">
+                        <Table className="dashboard-top-products-table">
+                            <TableHeader className="dashboard-top-products-table-header">
+                                <TableRow className="border-zinc-200/50 dark:border-zinc-700/40">
+                                    <TableHead className="h-8 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">#</TableHead>
+                                    <TableHead className="h-8 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Product</TableHead>
+                                    <TableHead className="h-8 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Units</TableHead>
+                                    <TableHead className="h-8 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Revenue</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {topProducts.map((p) => (
+                                    <TableRow
+                                        key={p.rank}
+                                        className="border-zinc-200/50 transition-colors hover:bg-zinc-100/50 dark:border-zinc-700/40 dark:hover:bg-zinc-800/40"
+                                    >
+                                        <TableCell className="py-2 text-xs text-muted-foreground">{p.rank}</TableCell>
+                                        <TableCell className="py-2 text-sm font-medium">{p.name}</TableCell>
+                                        <TableCell className="py-2 text-right text-sm">{p.units.toLocaleString()}</TableCell>
+                                        <TableCell className="py-2 text-right text-sm font-medium">{p.revenue}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+
+                <Card className="dashboard-category-chart border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                    <CardHeader className="dashboard-category-chart-header">
+                        <CardTitle className="dashboard-category-chart-title text-sm font-semibold">
+                            Inventory by Category
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="dashboard-category-chart-body">
+                        <div className="dashboard-category-chart-container h-56">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={categoryDistribution} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} horizontal={false} />
+                                    <XAxis type="number" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                                    <YAxis
+                                        type="category"
+                                        dataKey="name"
+                                        stroke="var(--muted-foreground)"
+                                        fontSize={11}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        width={90}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            background: 'var(--popover)',
+                                            border: '1px solid var(--border)',
+                                            borderRadius: 'var(--radius)',
+                                            fontSize: '12px',
+                                            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                                            backdropFilter: 'blur(12px)',
+                                        }}
+                                    />
+                                    <Bar dataKey="products" radius={[0, 4, 4, 0]} fill="var(--chart-1)" barSize={14} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <Card className="dashboard-stock-alerts border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                <CardHeader className="dashboard-stock-alerts-header">
+                    <CardTitle className="dashboard-stock-alerts-title flex items-center gap-2 text-sm font-semibold">
+                        <AlertTriangle className="size-4 text-amber-500" />
+                        Low Stock Alerts
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="dashboard-stock-alerts-body">
+                    <Table className="dashboard-stock-alerts-table">
+                        <TableHeader className="dashboard-stock-alerts-table-header">
+                            <TableRow className="border-zinc-200/50 dark:border-zinc-700/40">
+                                <TableHead className="h-8 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Product</TableHead>
+                                <TableHead className="h-8 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">SKU</TableHead>
+                                <TableHead className="h-8 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">On Hand</TableHead>
+                                <TableHead className="h-8 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Threshold</TableHead>
+                                <TableHead className="h-8 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {stockAlerts.map((item) => (
+                                <TableRow
+                                    key={item.sku}
+                                    className="border-zinc-200/50 transition-colors hover:bg-zinc-100/50 dark:border-zinc-700/40 dark:hover:bg-zinc-800/40"
+                                >
+                                    <TableCell className="py-2.5 text-sm font-medium">{item.product}</TableCell>
+                                    <TableCell className="py-2.5 text-sm text-muted-foreground">{item.sku}</TableCell>
+                                    <TableCell className="py-2.5 text-right text-sm font-medium text-rose-500">{item.quantity}</TableCell>
+                                    <TableCell className="py-2.5 text-right text-sm text-muted-foreground">{item.threshold}</TableCell>
+                                    <TableCell className="py-2.5 text-right">
+                                        <Badge
+                                            variant="destructive"
+                                            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+                                        >
+                                            Reorder
+                                        </Badge>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
 
             <Card className="dashboard-orders-card border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
                 <CardHeader className="dashboard-orders-card-header">
