@@ -1,0 +1,164 @@
+import { useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
+import { Eye, EyeOff, Mail, Lock, User, UserPlus, Sparkles } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+function SignUp() {
+    const navigate = useNavigate()
+    const { signUp, isLoading, error, clearError } = useAuthStore()
+    const [showPassword, setShowPassword] = useState(false)
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault()
+        clearError()
+        try { await signUp({ name, email, password }); navigate('/') } catch { /* handled */ }
+    }
+
+    return (
+        <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+            {/* bg mesh */}
+            <div className="pointer-events-none absolute inset-0 -z-10">
+                <div className="absolute right-1/4 top-1/4 size-96 rounded-full bg-gradient-to-l from-violet-400/30 to-purple-300/20 blur-3xl dark:from-violet-600/20 dark:to-purple-500/10" />
+                <div className="absolute bottom-1/4 left-1/4 size-80 rounded-full bg-gradient-to-r from-sky-400/25 to-indigo-300/15 blur-3xl dark:from-sky-600/15 dark:to-indigo-500/10" />
+                <div className="absolute left-1/2 top-2/3 size-64 -translate-x-1/2 rounded-full bg-gradient-to-br from-amber-300/15 to-orange-200/10 blur-3xl dark:from-amber-600/10 dark:to-orange-500/5" />
+            </div>
+
+            <div className="w-full max-w-sm animate-[fadeIn_0.6s_ease-out]">
+                {/* header */}
+                <div className="mb-10 text-center">
+                    <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-700 shadow-lg shadow-zinc-900/20 ring-1 ring-zinc-800/50 dark:from-white dark:to-zinc-300 dark:ring-white/20">
+                        <Sparkles className="size-6 text-white dark:text-zinc-900" />
+                    </div>
+                    <h1 className="text-3xl font-semibold tracking-tight">Create an account</h1>
+                    <p className="mt-2 text-sm text-muted-foreground">Enter your details to get started</p>
+                </div>
+
+                {/* card */}
+                <form
+                    onSubmit={handleSubmit}
+                    className="group/card rounded-2xl border border-zinc-200/60 bg-white/70 p-7 shadow-lg shadow-zinc-900/5 backdrop-blur-2xl transition-all duration-300 hover:shadow-xl dark:border-zinc-700/50 dark:bg-zinc-900/70 dark:hover:border-zinc-600/50"
+                >
+                    {error && (
+                        <div className="mb-5 animate-[fadeIn_0.3s] rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive shadow-sm">
+                            {error}
+                        </div>
+                    )}
+
+                    <div className="space-y-5">
+                        {/* name */}
+                        <div className="group/field relative">
+                            <User className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-4 -translate-y-1/2 text-zinc-400 transition-colors duration-200 group-focus-within/field:text-zinc-700 dark:group-focus-within/field:text-zinc-300" />
+                            <input
+                                id="name"
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required
+                                placeholder="John Doe"
+                                className={cn(
+                                    'peer w-full rounded-xl border border-zinc-200/70 bg-white/50 py-3 pl-10 pr-3.5 text-sm outline-none transition-all duration-200',
+                                    'placeholder:text-zinc-400',
+                                    'focus:border-zinc-400 focus:bg-white/80 focus:shadow-sm focus:ring-4 focus:ring-zinc-900/5',
+                                    'dark:border-zinc-700/60 dark:bg-zinc-800/40 dark:focus:border-zinc-500 dark:focus:bg-zinc-800/60 dark:focus:ring-white/5',
+                                )}
+                            />
+                        </div>
+
+                        {/* email */}
+                        <div className="group/field relative">
+                            <Mail className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-4 -translate-y-1/2 text-zinc-400 transition-colors duration-200 group-focus-within/field:text-zinc-700 dark:group-focus-within/field:text-zinc-300" />
+                            <input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                placeholder="you@example.com"
+                                className={cn(
+                                    'peer w-full rounded-xl border border-zinc-200/70 bg-white/50 py-3 pl-10 pr-3.5 text-sm outline-none transition-all duration-200',
+                                    'placeholder:text-zinc-400',
+                                    'focus:border-zinc-400 focus:bg-white/80 focus:shadow-sm focus:ring-4 focus:ring-zinc-900/5',
+                                    'dark:border-zinc-700/60 dark:bg-zinc-800/40 dark:focus:border-zinc-500 dark:focus:bg-zinc-800/60 dark:focus:ring-white/5',
+                                )}
+                            />
+                        </div>
+
+                        {/* password */}
+                        <div className="group/field relative">
+                            <Lock className="pointer-events-none absolute left-3.5 top-1/2 z-10 size-4 -translate-y-1/2 text-zinc-400 transition-colors duration-200 group-focus-within/field:text-zinc-700 dark:group-focus-within/field:text-zinc-300" />
+                            <input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                minLength={6}
+                                placeholder="At least 6 characters"
+                                className={cn(
+                                    'peer w-full rounded-xl border border-zinc-200/70 bg-white/50 py-3 pl-10 pr-10 text-sm outline-none transition-all duration-200',
+                                    'placeholder:text-zinc-400',
+                                    'focus:border-zinc-400 focus:bg-white/80 focus:shadow-sm focus:ring-4 focus:ring-zinc-900/5',
+                                    'dark:border-zinc-700/60 dark:bg-zinc-800/40 dark:focus:border-zinc-500 dark:focus:bg-zinc-800/60 dark:focus:ring-white/5',
+                                )}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className={cn(
+                            'mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-all duration-200',
+                            'bg-zinc-900 text-white shadow-sm shadow-zinc-900/10',
+                            'hover:bg-zinc-800 hover:shadow-md hover:shadow-zinc-900/15',
+                            'active:scale-[0.98]',
+                            'disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100',
+                            'dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200',
+                        )}
+                    >
+                        {isLoading ? (
+                            <div className="size-4 animate-spin rounded-full border-2 border-white/25 border-t-white dark:border-zinc-900/25 dark:border-t-zinc-900" />
+                        ) : (
+                            <>
+                                <UserPlus className="size-4" />
+                                Create Account
+                            </>
+                        )}
+                    </button>
+
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-zinc-200/60 dark:border-zinc-700/40" />
+                        </div>
+                        <div className="relative flex justify-center">
+                            <span className="bg-white/70 px-3 text-[11px] text-zinc-400 dark:bg-zinc-900/70 dark:text-zinc-500">
+                                Already registered?
+                            </span>
+                        </div>
+                    </div>
+
+                    <Link
+                        to="/login"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-200/70 py-3 text-sm font-medium text-zinc-700 transition-all duration-200 hover:bg-zinc-100/80 hover:shadow-sm active:scale-[0.98] dark:border-zinc-700/50 dark:text-zinc-300 dark:hover:bg-zinc-800/50"
+                    >
+                        Sign in instead
+                    </Link>
+                </form>
+            </div>
+        </div>
+    )
+}
+
+export default SignUp
