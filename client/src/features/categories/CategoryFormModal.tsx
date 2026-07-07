@@ -46,7 +46,6 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         // eslint-disable-next-line no-console
-        console.log('Category saved:', form)
         onClose()
     }
 
