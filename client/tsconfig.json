@@ -10,6 +10,10 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
+    "types": [
+      "node",
+      "express"
+    ],
     "paths": {
       "@/*": [
         "./src/*"
