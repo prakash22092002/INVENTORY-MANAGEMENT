@@ -4,7 +4,7 @@ import { Eye, EyeOff, Mail, Lock, User, UserPlus, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 function SignUp() {
-    const navigate = useNavigate()
+
     const [showPassword, setShowPassword] = useState(false)
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
