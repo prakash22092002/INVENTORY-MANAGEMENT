@@ -9,7 +9,6 @@
     }
   ],
   "compilerOptions": {
-    "baseUrl": ".",
     "types": [
       "node",
       "express"
