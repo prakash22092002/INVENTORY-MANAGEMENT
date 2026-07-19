@@ -43,6 +43,11 @@ export const signInUser = async (req: Request, res: Response): Promise<void> => 
 
         const user = await signInUserService(email, password);
 
+        if (!user) {
+            sendSuccessResponse(res, 200, 'User not found', { user: null });
+            return;
+        }
+
         const accessToken = generateAccessToken({ id: user._id.toString(), name: user.name, email: user.email, password: user.password });
 
         sendSuccessResponse(res, 200, 'User logged in successfully', {

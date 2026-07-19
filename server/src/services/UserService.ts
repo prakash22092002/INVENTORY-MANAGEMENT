@@ -34,7 +34,7 @@ export const createUserService = async (data: Partial<IUser>): Promise<IUser> =>
 
 
 
-export const signInUserService = async (email: string, password: string): Promise<IUser> => {
+export const signInUserService = async (email: string, password: string): Promise<IUser | null> => {
     if (!email || !password || typeof email !== 'string' || typeof password !== 'string' || password.trim().length === 0 || email.trim().length === 0) {
         throw new Error('Please provide both email and password');
     }
@@ -49,7 +49,7 @@ export const signInUserService = async (email: string, password: string): Promis
     const existingUser = await findUserByEmail(email);
 
     if (!existingUser) {
-        throw new Error('User not found');
+        return null;
     }
 
     if (!existingUser.password) {
