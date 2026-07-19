@@ -1,18 +1,13 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import { routes } from './routes/routes.tsx'
 import { Navbar } from './features/navbar/Navbar'
-import { useAuthStore } from './store/authStore'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import './App.css'
 
 function AppContent() {
   const { pathname } = useLocation()
-  const { checkAuth } = useAuthStore()
-
-  useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
 
   const hideNavbar = pathname === '/login' || pathname === '/signup'
 
@@ -38,6 +33,7 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" richColors />
       <AppContent />
     </BrowserRouter>
   )

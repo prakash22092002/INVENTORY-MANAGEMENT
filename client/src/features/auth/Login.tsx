@@ -1,20 +1,39 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
 import { Eye, EyeOff, Mail, Lock, LogIn, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { signInApi } from '@/services/api/auth'
+import { toast } from 'sonner'
 
 function Login() {
     const navigate = useNavigate()
-    const { login, isLoading, error, clearError } = useAuthStore()
+
     const [showPassword, setShowPassword] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        clearError()
-        try { await login({ email, password }); navigate('/') } catch { /* handled */ }
+        setIsLoading(true)
+        try {
+            const res = await signInApi({ email, password });
+            console.log(res)
+            
+            if (!res.data?.user) {
+                toast.error(res.data?.message || 'User not found')
+                return
+            }
+            
+            localStorage.setItem('token', res.data.user.accessToken)
+            toast.success(res.data?.message || 'Logged in successfully!')
+            navigate('/')
+        } catch (err: any) {
+            const errMsg = err.response?.data?.data?.message || err.message || 'Login failed'
+            toast.error(errMsg)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -41,11 +60,11 @@ function Login() {
                     onSubmit={handleSubmit}
                     className="group/card rounded-2xl border border-zinc-200/60 bg-white/70 p-7 shadow-lg shadow-zinc-900/5 backdrop-blur-2xl transition-all duration-300 hover:shadow-xl dark:border-zinc-700/50 dark:bg-zinc-900/70 dark:hover:border-zinc-600/50"
                 >
-                    {error && (
+                    {/* {error && (
                         <div className="mb-5 animate-[fadeIn_0.3s] rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive shadow-sm">
                             {error}
                         </div>
-                    )}
+                    )} */}
 
                     <div className="space-y-5">
                         {/* email */}

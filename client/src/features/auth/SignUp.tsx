@@ -1,12 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
 import { Eye, EyeOff, Mail, Lock, User, UserPlus, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 function SignUp() {
     const navigate = useNavigate()
-    const { signUp, isLoading, error, clearError } = useAuthStore()
     const [showPassword, setShowPassword] = useState(false)
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -14,8 +12,6 @@ function SignUp() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        clearError()
-        try { await signUp({ name, email, password }); navigate('/') } catch { /* handled */ }
     }
 
     return (
@@ -42,11 +38,11 @@ function SignUp() {
                     onSubmit={handleSubmit}
                     className="group/card rounded-2xl border border-zinc-200/60 bg-white/70 p-7 shadow-lg shadow-zinc-900/5 backdrop-blur-2xl transition-all duration-300 hover:shadow-xl dark:border-zinc-700/50 dark:bg-zinc-900/70 dark:hover:border-zinc-600/50"
                 >
-                    {error && (
+                    {/* {error && (
                         <div className="mb-5 animate-[fadeIn_0.3s] rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive shadow-sm">
                             {error}
                         </div>
-                    )}
+                    )} */}
 
                     <div className="space-y-5">
                         {/* name */}
@@ -118,7 +114,7 @@ function SignUp() {
 
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        // disabled={isLoading}
                         className={cn(
                             'mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-all duration-200',
                             'bg-zinc-900 text-white shadow-sm shadow-zinc-900/10',
@@ -128,7 +124,7 @@ function SignUp() {
                             'dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200',
                         )}
                     >
-                        {isLoading ? (
+                        {false ? (
                             <div className="size-4 animate-spin rounded-full border-2 border-white/25 border-t-white dark:border-zinc-900/25 dark:border-t-zinc-900" />
                         ) : (
                             <>

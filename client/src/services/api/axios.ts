@@ -8,6 +8,18 @@ const api = axios.create({
     },
 })
 
+// Attach JWT token from localStorage to authorization header
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
+    },
+    (error) => Promise.reject(error)
+)
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
