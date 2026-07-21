@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, UserPlus, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signUpApi } from '@/services/api/auth'
@@ -12,6 +12,8 @@ function SignUp() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
+
+    const navigate = useNavigate()
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
@@ -39,6 +41,7 @@ function SignUp() {
             localStorage.setItem("userEmail", response?.data?.user?.email);
             localStorage.setItem("userName", response?.data?.user?.name);
 
+            navigate('/')
 
         } catch (err: any) {
             toast.error(err?.response?.data?.data?.message || "Something went wrong")
