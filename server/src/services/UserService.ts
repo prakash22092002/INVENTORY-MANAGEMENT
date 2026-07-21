@@ -44,8 +44,6 @@ export const signInUserService = async (email: string, password: string): Promis
         throw new Error('Invalid email address');
     }
 
-    console.log(email, password, 'this i sthe email and pass')
-
     const existingUser = await findUserByEmail(email);
 
     if (!existingUser) {
