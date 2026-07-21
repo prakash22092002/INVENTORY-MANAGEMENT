@@ -2,6 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, UserPlus, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { signUpApi } from '@/services/api/auth'
+import { toast } from 'sonner'
 
 function SignUp() {
 
@@ -9,9 +11,44 @@ function SignUp() {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
+
+        try {
+            setLoading(true)
+
+            const payload = {
+                name,
+                email,
+                password
+            }
+
+            const response = await signUpApi(payload);
+
+            if (response?.es !== 0) {
+                toast.error(response?.em);
+                return
+            }
+
+            toast.success(response?.data?.message || 'user created successfully');
+
+            localStorage.setItem("accessToken", response?.data?.user?.accessToken);
+            localStorage.setItem("userName", response?.data?.user?.name);
+            localStorage.setItem("userEmail", response?.data?.user?.email);
+            localStorage.setItem("userName", response?.data?.user?.name);
+
+
+        } catch (err) {
+            toast.error(err?.response?.data?.data?.message)
+        }
+        finally {
+            setLoading(false)
+            setName("")
+            setEmail("")
+            setPassword("")
+        }
     }
 
     return (
@@ -114,7 +151,7 @@ function SignUp() {
 
                     <button
                         type="submit"
-                        // disabled={isLoading}
+                        disabled={loading}
                         className={cn(
                             'mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-all duration-200',
                             'bg-zinc-900 text-white shadow-sm shadow-zinc-900/10',
