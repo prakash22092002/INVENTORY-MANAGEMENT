@@ -17,12 +17,12 @@ function AppContent() {
       <main className={hideNavbar ? '' : 'mt-4 px-1 pb-8 sm:mt-6 sm:px-2'}>
         <Routes>
           {routes?.map((route) => {
-            const element = route.hideNavbar ? (
-              route.element
+            const element = route?.hideNavbar ? (
+              route?.element
             ) : (
-              <ProtectedRoute>{route.element}</ProtectedRoute>
+              <ProtectedRoute>{route?.element}</ProtectedRoute>
             )
-            return <Route key={route.path} path={route.path} element={element} />
+            return <Route key={route?.path} path={route?.path} element={element} />
           })}
         </Routes>
       </main>

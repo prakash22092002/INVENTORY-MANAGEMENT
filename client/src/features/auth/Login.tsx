@@ -18,15 +18,13 @@ function Login() {
         setIsLoading(true)
         try {
             const res = await signInApi({ email, password });
-            console.log(res)
 
-            if (!res.data?.user) {
-                toast.error(res.data?.message || 'User not found')
-                return
+            if (res?.data?.user?.accessToken) {
+                localStorage.setItem('accessToken', res?.data?.user?.accessToken)
             }
 
-            localStorage.setItem('accessToken', res.data.user.accessToken)
             toast.success(res.data?.message || 'Logged in successfully!')
+
             navigate('/')
         } catch (err: any) {
             const errMsg = err.response?.data?.data?.message || err.message || 'Login failed'
