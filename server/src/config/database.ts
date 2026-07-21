@@ -1,4 +1,8 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+// Force DNS resolution to Google Public DNS to prevent querySrv ECONNREFUSED errors on local networks
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const connectDB = async () => {
     try {
