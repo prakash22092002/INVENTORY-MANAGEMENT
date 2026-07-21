@@ -88,7 +88,7 @@ function UserDropdown({ open, onClose }: { open: boolean; onClose: () => void })
             {open && <div className="navbar-user-backdrop fixed inset-0 z-40" onClick={onClose} />}
             <div
                 className={cn(
-                    'navbar-user-dropdown absolute right-0 top-full z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-zinc-200/60 bg-white/80 p-1 shadow-lg shadow-zinc-900/5 backdrop-blur-2xl transition-all duration-200 dark:border-zinc-700/50 dark:bg-zinc-900/80',
+                    'navbar-user-dropdown absolute right-0 top-full z-50 mt-2 min-w-56 w-max max-w-xs origin-top-right overflow-hidden rounded-xl border border-zinc-200/60 bg-white/80 p-1 shadow-lg shadow-zinc-900/5 backdrop-blur-2xl transition-all duration-200 dark:border-zinc-700/50 dark:bg-zinc-900/80',
                     open ? 'visible scale-100 opacity-100' : 'invisible scale-95 opacity-0',
                 )}
             >
@@ -96,9 +96,9 @@ function UserDropdown({ open, onClose }: { open: boolean; onClose: () => void })
                     <div className="navbar-user-dropdown-avatar flex size-8 items-center justify-center rounded-full bg-zinc-200 text-xs font-medium text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
                         {profileLogo}
                     </div>
-                    <div className="navbar-user-dropdown-info flex flex-col">
-                        <span className="navbar-user-dropdown-name text-sm font-medium">{userName}</span>
-                        <span className="navbar-user-dropdown-email text-xs text-zinc-400">{userEmail}</span>
+                    <div className="navbar-user-dropdown-info flex min-w-0 flex-col">
+                        <span className="navbar-user-dropdown-name truncate text-sm font-medium">{userName}</span>
+                        <span className="navbar-user-dropdown-email truncate text-xs text-zinc-400">{userEmail}</span>
                     </div>
                 </div>
                 <div className="navbar-user-dropdown-menu mt-1 space-y-0.5">
