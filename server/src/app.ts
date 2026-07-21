@@ -11,9 +11,17 @@ const app = express();
 
 // Global Middlewares
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.CLIENT_URL,
+    process.env.CLIENT_DEV_URL
+].filter((url): url is string => Boolean(url));
 
-app.use(cors({ origin: process.env.CLIENT_DEV_URL, credentials: true }));
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
 
 app.use(morgan('dev'));
 app.use(express.json());
