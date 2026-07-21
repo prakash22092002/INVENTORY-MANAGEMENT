@@ -82,12 +82,12 @@ function Login() {
                                     'dark:border-zinc-700/60 dark:bg-zinc-800/40 dark:focus:border-zinc-500 dark:focus:bg-zinc-800/60 dark:focus:ring-white/5',
                                 )}
                             />
-                            <label
+                            {/* <label
                                 htmlFor="email"
                                 className="absolute -top-2 left-2.5 z-10 hidden px-1.5 text-[11px] font-medium text-zinc-500 transition-all duration-200 peer-focus:inline-flex peer-[&:not(:placeholder-shown)]:inline-flex dark:text-zinc-400"
                             >
                                 Email
-                            </label>
+                            </label> */}
                         </div>
 
                         {/* password */}
