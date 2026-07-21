@@ -40,8 +40,8 @@ function SignUp() {
             localStorage.setItem("userName", response?.data?.user?.name);
 
 
-        } catch (err) {
-            toast.error(err?.response?.data?.data?.message)
+        } catch (err: any) {
+            toast.error(err?.response?.data?.data?.message || "Something went wrong")
         }
         finally {
             setLoading(false)
