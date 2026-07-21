@@ -11,7 +11,10 @@ const app = express();
 
 // Global Middlewares
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
+app.use(cors({ origin: process.env.CLIENT_DEV_URL, credentials: true }));
+
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
