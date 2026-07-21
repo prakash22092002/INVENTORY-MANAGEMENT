@@ -6,6 +6,7 @@ import morgan from 'morgan';
 
 // Route Imports
 import userRoutes from './routes/userRoutes';
+import productRoutes from './routes/productRoutes/productsRoutes'
 
 const app = express();
 
@@ -37,6 +38,16 @@ app.get("/", (req, res) => {
 
 // API Routes Mounting
 app.use('/api/users', userRoutes);
+app.use('/api/product', productRoutes);
+
+// 404 Handler
+app.use((req, res) => {
+    res.status(404).json({
+        es: 1,
+        statusCode: 404,
+        message: `Route ${req.method} ${req.originalUrl} not found`
+    });
+});
 
 export default app;
 
