@@ -172,14 +172,20 @@ const stockAlerts = [
 ]
 
 const Dashboard = () => {
+
+
+    const fullname = localStorage.getItem('userName');
+    const firstName = fullname?.split(' ')[0] || ""
+
+
     return (
         <div className="dashboard flex flex-col gap-6">
             <div className="dashboard-header flex flex-col gap-1">
                 <h1 className="dashboard-header-title text-2xl font-semibold tracking-tight sm:text-3xl">
-                    Prakash Paudel
+                    {fullname}
                 </h1>
                 <p className="dashboard-header-subtitle text-sm text-muted-foreground">
-                    Welcome back, Prakash.
+                    {`Welcome back, ${firstName}.`}
                 </p>
             </div>
 

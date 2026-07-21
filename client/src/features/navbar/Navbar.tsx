@@ -72,6 +72,17 @@ function NotificationDropdown({ open, onClose }: { open: boolean; onClose: () =>
 }
 
 function UserDropdown({ open, onClose }: { open: boolean; onClose: () => void }) {
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail")
+
+    const profileLogo = userName?.split(' ').map((word) => word[0]).join('').toUpperCase()
+
+
+    const signOutFn = (): void => {
+        localStorage.clear();
+        window.location.href = "/signup";
+    }
+
     return (
         <>
             {open && <div className="navbar-user-backdrop fixed inset-0 z-40" onClick={onClose} />}
@@ -83,11 +94,11 @@ function UserDropdown({ open, onClose }: { open: boolean; onClose: () => void })
             >
                 <div className="navbar-user-dropdown-header flex items-center gap-3 border-b border-zinc-100 px-3 py-2.5 dark:border-zinc-800">
                     <div className="navbar-user-dropdown-avatar flex size-8 items-center justify-center rounded-full bg-zinc-200 text-xs font-medium text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
-                        PP
+                        {profileLogo}
                     </div>
                     <div className="navbar-user-dropdown-info flex flex-col">
-                        <span className="navbar-user-dropdown-name text-sm font-medium">Prakash Paudel</span>
-                        <span className="navbar-user-dropdown-email text-xs text-zinc-400">prakash@example.com</span>
+                        <span className="navbar-user-dropdown-name text-sm font-medium">{userName}</span>
+                        <span className="navbar-user-dropdown-email text-xs text-zinc-400">{userEmail}</span>
                     </div>
                 </div>
                 <div className="navbar-user-dropdown-menu mt-1 space-y-0.5">
@@ -100,7 +111,7 @@ function UserDropdown({ open, onClose }: { open: boolean; onClose: () => void })
                         Settings
                     </button>
                     <div className="navbar-user-dropdown-divider my-1 border-t border-zinc-100 dark:border-zinc-800" />
-                    <button className="navbar-user-dropdown-item navbar-user-dropdown-item--signout flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-zinc-500 transition-colors hover:bg-zinc-100/70 hover:text-zinc-800 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200">
+                    <button onClick={signOutFn} className="navbar-user-dropdown-item navbar-user-dropdown-item--signout flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-zinc-500 transition-colors hover:bg-zinc-100/70 hover:text-zinc-800 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200">
                         <LogOut className="navbar-user-dropdown-item-icon size-4" />
                         Sign Out
                     </button>
@@ -111,6 +122,12 @@ function UserDropdown({ open, onClose }: { open: boolean; onClose: () => void })
 }
 
 function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
+
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail")
+
+    const profileLogo = userName?.split(' ').map((word) => word[0]).join('').toUpperCase()
+
     return (
         <>
             {open && (
@@ -128,9 +145,9 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
                 <div className="navbar-mobile-island-header flex items-center justify-between px-4 py-4">
                     <Link to="/" className="navbar-mobile-island-logo flex items-center gap-2.5">
                         <div className="navbar-mobile-island-logo-icon flex size-7 items-center justify-center rounded-lg bg-zinc-800 text-[10px] font-bold tracking-wider text-white dark:bg-zinc-200 dark:text-zinc-800">
-                            I
+                            MV
                         </div>
-                        <span className="navbar-mobile-island-logo-text text-sm font-bold tracking-tight">INV.MGT</span>
+                        <span className="navbar-mobile-island-logo-text text-sm font-bold tracking-tight">MAMA VANJA</span>
                     </Link>
                     <button
                         onClick={onClose}
@@ -158,11 +175,11 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
                 <div className="navbar-mobile-island-footer border-t border-zinc-100 px-2 py-3 dark:border-zinc-800">
                     <div className="navbar-mobile-island-user flex items-center gap-3 rounded-xl px-3 py-2">
                         <div className="navbar-mobile-island-user-avatar flex size-7 items-center justify-center rounded-full bg-zinc-200 text-[10px] font-medium text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
-                            PP
+                            {profileLogo}
                         </div>
                         <div className="navbar-mobile-island-user-info flex flex-col">
-                            <span className="navbar-mobile-island-user-name text-sm font-medium">Prakash Paudel</span>
-                            <span className="navbar-mobile-island-user-email text-xs text-zinc-400">prakash@example.com</span>
+                            <span className="navbar-mobile-island-user-name text-sm font-medium">{userName}</span>
+                            <span className="navbar-mobile-island-user-email text-xs text-zinc-400">{userEmail}</span>
                         </div>
                     </div>
                 </div>
@@ -188,6 +205,8 @@ function Navbar() {
         return () => document.removeEventListener('keydown', closeOnEscape)
     }, [])
 
+    const profileLogo = localStorage.getItem('userName')?.split(' ')?.map((word) => word[0]).join('').toUpperCase()
+
     return (
         <>
             <header
@@ -205,7 +224,7 @@ function Navbar() {
 
                 <Link to="/" className="navbar-logo-link flex items-center gap-2">
                     <div className="navbar-logo-icon flex size-6 items-center justify-center rounded-md bg-zinc-800 text-[9px] font-bold tracking-wider text-white dark:bg-zinc-200 dark:text-zinc-800">
-                        I
+                        MV
                     </div>
                 </Link>
 
@@ -233,7 +252,7 @@ function Navbar() {
                             aria-label="User menu"
                         >
                             <div className="navbar-user-avatar flex size-6 items-center justify-center rounded-full bg-zinc-200 text-[9px] font-medium text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
-                                PP
+                                {profileLogo}
                             </div>
                         </button>
                         <UserDropdown open={userOpen} onClose={() => setUserOpen(false)} />
