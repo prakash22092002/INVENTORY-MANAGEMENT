@@ -1,4 +1,3 @@
-export type ProductStatus = 'In Stock' | 'Low Stock' | 'Out of Stock'
 
 export interface Product {
     id: string
@@ -7,7 +6,8 @@ export interface Product {
     category: string
     price: number
     stock: number
-    status: ProductStatus
+    barcode: string
+    status: string
     description: string
     createdAt: string
     updatedAt: string

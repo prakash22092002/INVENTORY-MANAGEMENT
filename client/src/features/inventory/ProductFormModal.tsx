@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { Product, ProductStatus } from '@/types/inventory'
+import type { Product } from '@/types/inventory'
 
 const categories = ['Electronics', 'Accessories', 'Peripherals', 'Cables', 'Storage']
-const statuses: ProductStatus[] = ['In Stock', 'Low Stock', 'Out of Stock']
 
 type ProductFormData = {
     name: string
@@ -12,7 +11,7 @@ type ProductFormData = {
     category: string
     price: string
     stock: string
-    status: ProductStatus
+    barcode: string
     description: string
 }
 
@@ -28,7 +27,7 @@ const emptyForm: ProductFormData = {
     category: 'Electronics',
     price: '',
     stock: '',
-    status: 'In Stock',
+    barcode: '',
     description: '',
 }
 
@@ -43,7 +42,7 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
                 category: product.category,
                 price: product.price.toString(),
                 stock: product.stock.toString(),
-                status: product.status,
+                barcode: product.barcode.toString(),
                 description: product.description,
             })
         } else {
@@ -134,17 +133,16 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
                         </div>
                         <div className="product-form-modal-field">
                             <label className="product-form-modal-field-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                                Status
+                                Barcode
                             </label>
-                            <select
-                                value={form.status}
-                                onChange={(e) => handleChange('status', e.target.value)}
-                                className="product-form-modal-select h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
-                            >
-                                {statuses.map((s) => (
-                                    <option key={s} value={s}>{s}</option>
-                                ))}
-                            </select>
+                            <input
+                                type="text"
+                                value={form.barcode}
+                                onChange={(e) => handleChange('barcode', e.target.value)}
+                                required
+                                className="product-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
+                                placeholder="Add Barcode"
+                            />
                         </div>
                         <div className="product-form-modal-field">
                             <label className="product-form-modal-field-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -158,7 +156,7 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
                                 onChange={(e) => handleChange('price', e.target.value)}
                                 required
                                 className="product-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
-                                placeholder="29.99"
+                                placeholder="Add Price"
                             />
                         </div>
                         <div className="product-form-modal-field">
@@ -172,7 +170,7 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
                                 onChange={(e) => handleChange('stock', e.target.value)}
                                 required
                                 className="product-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
-                                placeholder="100"
+                                placeholder="Add Stock Quantity"
                             />
                         </div>
                     </div>
@@ -186,7 +184,7 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
                             onChange={(e) => handleChange('description', e.target.value)}
                             rows={3}
                             className="product-form-modal-textarea w-full resize-none rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
-                            placeholder="Product description..."
+                            placeholder="Add Description"
                         />
                     </div>
 
