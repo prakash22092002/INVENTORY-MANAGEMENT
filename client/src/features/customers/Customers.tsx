@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,9 +12,36 @@ import {
 } from '@/components/ui/table'
 import { Users, Plus } from 'lucide-react'
 import { mockCustomers, customerStatusVariant } from '@/data/customers'
+import type { Customer } from '@/types/customer'
+import CustomerFormModal, { type CustomerFormData } from './CustomerFormModal'
 
 const Customers = () => {
     const navigate = useNavigate()
+    const [customers, setCustomers] = useState<Customer[]>(mockCustomers)
+    const [modalOpen, setModalOpen] = useState(false)
+
+    const handleAddCustomerSubmit = (data: CustomerFormData) => {
+        const newCustomer: Customer = {
+            id: `CUST-${String(mockCustomers.length + 1).padStart(3, '0')}`,
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            company: data.company || 'N/A',
+            totalOrders: 0,
+            totalSpent: 0,
+            status: data.status,
+            joinDate: new Date().toISOString().split('T')[0],
+            lastOrderDate: 'Never',
+            address: data.address,
+            city: data.city,
+            country: data.country,
+            state: data.state,
+            pincode: data.pincode,
+            vatNumber: data.vatNumber,
+        }
+        mockCustomers.unshift(newCustomer)
+        setCustomers([newCustomer, ...customers])
+    }
 
     return (
         <div className="customers flex flex-col gap-6">
@@ -26,7 +54,10 @@ const Customers = () => {
                         View and manage your customer relationships.
                     </p>
                 </div>
-                <button className="customers-create-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300">
+                <button
+                    onClick={() => setModalOpen(true)}
+                    className="customers-create-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
+                >
                     <Plus className="customers-create-btn-icon size-4" />
                     Add Customer
                 </button>
@@ -51,14 +82,14 @@ const Customers = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody className="customers-table-body">
-                            {mockCustomers.length === 0 ? (
+                            {customers.length === 0 ? (
                                 <TableRow className="customers-table-empty-row">
                                     <TableCell colSpan={6} className="customers-table-empty-cell py-12 text-center text-sm text-muted-foreground">
                                         No customers found.
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                mockCustomers.map((customer) => (
+                                customers.map((customer) => (
                                     <TableRow
                                         key={customer.id}
                                         onClick={() => navigate(`/customers/${customer.id}`)}
@@ -99,6 +130,12 @@ const Customers = () => {
                     </Table>
                 </CardContent>
             </Card>
+
+            <CustomerFormModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleAddCustomerSubmit}
+            />
         </div>
     )
 }

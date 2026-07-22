@@ -12,4 +12,8 @@ export interface Customer {
     address: string
     city: string
     country: string
+    state?: string
+    pincode?: string
+    vatNumber?: string
 }
+
