@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Product } from '@/types/inventory'
+import type { CreateProductPayload } from '@/types/auth'
+import { toast } from 'sonner'
+import { createProductApi } from '@/services/api/auth'
 
 const categories = ['Electronics', 'Accessories', 'Peripherals', 'Cables', 'Storage']
 
@@ -33,6 +36,7 @@ const emptyForm: ProductFormData = {
 
 const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => {
     const [form, setForm] = useState<ProductFormData>(emptyForm)
+    const [formLoader, setFormLoader] = useState<boolean>(false)
 
     useEffect(() => {
         if (product) {
@@ -54,11 +58,41 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
         setForm((prev) => ({ ...prev, [field]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        // eslint-disable-next-line no-console
-        console.log('Product saved:', form)
-        onClose()
+    const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+
+        try {
+
+            e.preventDefault()
+            setFormLoader(true)
+
+            const formData: CreateProductPayload = {
+                productName: form.name,
+                sku: form.sku,
+                category: form.category,
+                barcode: form.barcode,
+                price: parseFloat(form.price),
+                stockQuantity: parseInt(form.stock),
+                description: form.description,
+            }
+
+            const response = await createProductApi(formData);
+
+            if (response?.es === 0) {
+                toast.success(response?.data?.message || 'Product created successfully');
+            } else {
+                toast.error(response?.data?.message || 'Failed to create product');
+            }
+
+            setForm(emptyForm)
+            onClose()
+
+        } catch (err) {
+            toast.error('Failed to create product');
+        }
+        finally {
+            setFormLoader(false)
+        }
+
     }
 
     const isEdit = !!product
@@ -197,10 +231,11 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
                             Cancel
                         </button>
                         <button
+                            disabled={formLoader}
                             type="submit"
                             className="product-form-modal-submit-btn rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
                         >
-                            {isEdit ? 'Save Changes' : 'Create Product'}
+                            {formLoader ? 'Creating...' : (isEdit ? 'Save Changes' : 'Create Product')}
                         </button>
                     </div>
                 </form>

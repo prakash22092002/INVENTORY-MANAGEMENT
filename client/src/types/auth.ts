@@ -19,3 +19,19 @@ export interface LoginPayload {
     email: string
     password: string
 }
+
+export interface GetAllPaymentPayload {
+    page: number,
+    pageSize: number,
+    search: string
+}
+
+export interface CreateProductPayload {
+    productName: string,
+    sku: string,
+    category: string,
+    barcode: string,
+    price: number,
+    stockQuantity: number,
+    description: string
+}
