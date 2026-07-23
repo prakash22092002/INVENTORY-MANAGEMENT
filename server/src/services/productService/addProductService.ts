@@ -13,7 +13,15 @@ const addProductService = async (data: Partial<IProduct>): Promise<IProduct> => 
         throw new Error("Please provide valid data");
     }
 
-    const savedProduct = await createProductRepo({ productName, sku, category, barcode, price, stockQuantity, description });
+    const savedProduct = await createProductRepo({
+        productName,
+        sku,
+        category,
+        barcode,
+        price,
+        stockQuantity,
+        description
+    } as IProduct);
 
     return savedProduct;
 }
