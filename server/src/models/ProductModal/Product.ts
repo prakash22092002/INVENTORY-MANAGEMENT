@@ -3,6 +3,13 @@
 
 import { Schema, model, Document } from "mongoose";
 
+
+export interface IProductQuery {
+    page: number;
+    pageSize: number;
+    search?: string
+}
+
 export interface IProduct extends Document {
     productName: string,
     sku: string,
