@@ -27,7 +27,7 @@ export const getProductController = async (req: Request, res: Response, next: Ne
         const products = await getAllProductService({ page, pageSize, search });
         sendSuccessResponse(res, 200, 'Products fetched successfully', {
             page,
-            total: pageSize,
+            total: products?.length,
             products
         });
 
