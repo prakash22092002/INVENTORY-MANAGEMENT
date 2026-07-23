@@ -34,3 +34,8 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProduct[]>
     return products
 
 }
+
+export const getProductByIdRepo = async (productId: string): Promise<IProduct | null> => {
+    const product = await Product.findById(productId);
+    return product;
+}
