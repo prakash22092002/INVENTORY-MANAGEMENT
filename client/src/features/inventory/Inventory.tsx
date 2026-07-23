@@ -129,7 +129,7 @@ const Inventory = () => {
                                                 variant={statusVariant[product.status]}
                                                 className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
                                             >
-                                                {product.status}
+                                                {product.status.split('_').join(' ')}
                                             </Badge>
                                         </TableCell>
                                     </TableRow>

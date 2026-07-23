@@ -17,7 +17,8 @@ export interface IProduct extends Document {
     barcode: string,
     price: number,
     stockQuantity: number,
-    description: string
+    description?: string,
+    stockAlert?: string
 }
 
 const ProductSchema = new Schema<IProduct>(
@@ -54,6 +55,9 @@ const ProductSchema = new Schema<IProduct>(
             type: String,
             required: [true, 'Description is required'],
             trim: true
+        },
+        stockAlert: {
+            type: String
         }
     },
     {

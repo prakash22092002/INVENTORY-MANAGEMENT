@@ -6,8 +6,20 @@ import { IProduct, IProductQuery, Product } from "../models/ProductModal/Product
  * @returns Promise<IProduct> - The created product.
  */
 
-export const createProductRepo = async (data: Partial<IProduct>): Promise<IProduct> => {
+export const createProductRepo = async (data: IProduct): Promise<IProduct> => {
     const product = new Product(data);
+
+    if (data.stockQuantity > 20) {
+        product.stockAlert = "in_stock";
+    }
+    else if (data.stockQuantity <= 20 && data.stockQuantity >= 1) {
+        product.stockAlert = "low_stock";
+    }
+    else {
+        product.stockAlert = "out_of_stock";
+    }
+
+    console.log(product, 'this is the end create new product object---')
     return await product.save();
 }
 
@@ -28,7 +40,6 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProduct[]>
         return searchedProducts
     }
 
-
     const products = await Product.find().skip(skip).limit(limit);
 
     return products
@@ -36,6 +47,12 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProduct[]>
 }
 
 export const getProductByIdRepo = async (productId: string): Promise<IProduct | null> => {
+
     const product = await Product.findById(productId);
+
+    if (!product) {
+        return null;
+    }
+
     return product;
 }
