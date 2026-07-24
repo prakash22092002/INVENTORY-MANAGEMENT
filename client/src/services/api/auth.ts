@@ -20,3 +20,8 @@ export const createProductApi = async (payload: CreateProductPayload) => {
     const response = await api.post('/api/product/add', payload);
     return response.data;
 }
+
+export const getProductByIdApi = async (productId: string) => {
+    const response = await api.get(`/api/product/${productId}`);
+    return response.data;
+}
