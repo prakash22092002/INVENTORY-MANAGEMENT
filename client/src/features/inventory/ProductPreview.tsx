@@ -68,7 +68,6 @@ const ProductPreview = () => {
                 setProductPreviewData(data.data?.product || null)
             }
         } catch (error) {
-            console.log(error)
             toast.error("An error occurred while fetching product")
         } finally {
             setProductPreviewDataLoading(false)

@@ -19,7 +19,6 @@ export const createProductRepo = async (data: IProduct): Promise<IProduct> => {
         product.stockAlert = "out_of_stock";
     }
 
-    console.log(product, 'this is the end create new product object---')
     return await product.save();
 }
 

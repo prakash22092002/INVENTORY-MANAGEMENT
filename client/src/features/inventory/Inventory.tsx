@@ -14,6 +14,7 @@ import { Package, Plus, X, Loader2 } from 'lucide-react'
 
 import ProductFormModal from './ProductFormModal'
 import { getAllProductsApi } from '@/services/api/auth'
+import { toast } from 'sonner'
 
 const Inventory = () => {
     const navigate = useNavigate()
@@ -44,8 +45,8 @@ const Inventory = () => {
             } else {
                 setProductData([]);
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "An error occurred while fetching products")
         }
         setProductLoader(false);
     }

@@ -4,8 +4,6 @@ import { sendErrorResponse } from "../../utils/responseHelper";
 
 const getAllProductvalidation = (req: Request, res: Response, next: NextFunction) => {
 
-    console.log('getAll product validation', req.body);
-
     const { page, pageSize, search } = req.body;
 
     if (page < 0 || typeof page !== 'number') {
