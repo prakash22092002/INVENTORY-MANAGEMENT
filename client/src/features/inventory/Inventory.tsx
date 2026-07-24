@@ -161,7 +161,7 @@ const Inventory = () => {
                                                 {product.category}
                                             </TableCell>
                                             <TableCell className="inventory-table-cell inventory-table-cell--price py-3 text-right text-sm font-medium">
-                                                ${price.toFixed(2)}
+                                                ₹{price.toFixed(2)}
                                             </TableCell>
                                             <TableCell className="inventory-table-cell inventory-table-cell--stock py-3 text-right text-sm">
                                                 {stockQuantity}
