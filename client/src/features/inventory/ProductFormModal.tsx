@@ -22,6 +22,7 @@ type ProductFormModalProps = {
     open: boolean
     onClose: () => void
     product?: Product
+    onSuccess?: () => void
 }
 
 const emptyForm: ProductFormData = {
@@ -34,7 +35,7 @@ const emptyForm: ProductFormData = {
     description: '',
 }
 
-const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => {
+const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModalProps) => {
     const [form, setForm] = useState<ProductFormData>(emptyForm)
     const [formLoader, setFormLoader] = useState<boolean>(false)
 
@@ -79,6 +80,7 @@ const ProductFormModal = ({ open, onClose, product }: ProductFormModalProps) => 
 
             if (response?.es === 0) {
                 toast.success(response?.data?.message || 'Product created successfully');
+                onSuccess?.();
             } else {
                 toast.error(response?.data?.message || 'Failed to create product');
             }

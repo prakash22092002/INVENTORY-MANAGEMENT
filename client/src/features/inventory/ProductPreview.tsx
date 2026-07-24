@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Package, ArrowLeft, Edit, Calendar, Tag, DollarSign, Box, Layers } from 'lucide-react'
-import { mockProducts, statusVariant } from '@/data/products'
+
 import ProductFormModal from './ProductFormModal'
 
 const ProductPreview = () => {
@@ -11,9 +11,9 @@ const ProductPreview = () => {
     const navigate = useNavigate()
     const [editOpen, setEditOpen] = useState(false)
 
-    const product = mockProducts.find((p) => p.id === id)
 
-    if (!product) {
+
+    if (true) {
         return (
             <div className="product-preview-not-found flex flex-col items-center justify-center gap-4 py-24">
                 <Package className="product-preview-not-found-icon size-12 text-zinc-300" />
@@ -27,15 +27,15 @@ const ProductPreview = () => {
         )
     }
 
-    const detailItems = [
-        { label: 'Product ID', value: product.id, icon: Tag },
-        { label: 'SKU', value: product.sku, icon: Layers },
-        { label: 'Category', value: product.category, icon: Box },
-        { label: 'Price', value: `$${product.price.toFixed(2)}`, icon: DollarSign },
-        { label: 'Stock', value: `${product.stock} units`, icon: Box },
-        { label: 'Created', value: product.createdAt, icon: Calendar },
-        { label: 'Updated', value: product.updatedAt, icon: Calendar },
-    ]
+    // const detailItems = [
+    //     { label: 'Product ID', value: product.id, icon: Tag },
+    //     { label: 'SKU', value: product.sku, icon: Layers },
+    //     { label: 'Category', value: product.category, icon: Box },
+    //     { label: 'Price', value: `$${product.price.toFixed(2)}`, icon: DollarSign },
+    //     { label: 'Stock', value: `${product.stock} units`, icon: Box },
+    //     { label: 'Created', value: product.createdAt, icon: Calendar },
+    //     { label: 'Updated', value: product.updatedAt, icon: Calendar },
+    // ]
 
     return (
         <div className="product-preview flex flex-col gap-6">
@@ -56,15 +56,15 @@ const ProductPreview = () => {
                     </div>
                     <div className="product-preview-hero-text flex flex-col gap-1.5">
                         <div className="product-preview-hero-title-row flex items-center gap-2.5">
-                            <h1 className="product-preview-hero-name text-xl font-semibold tracking-tight sm:text-2xl">{product.name}</h1>
+                            <h1 className="product-preview-hero-name text-xl font-semibold tracking-tight sm:text-2xl">{"name"}</h1>
                             <Badge
-                                variant={statusVariant[product.status]}
+                                variant={"default"}
                                 className="product-preview-hero-badge rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
                             >
-                                {product.status}
+                                {"status"}
                             </Badge>
                         </div>
-                        <p className="product-preview-hero-desc max-w-lg text-sm text-muted-foreground">{product.description}</p>
+                        <p className="product-preview-hero-desc max-w-lg text-sm text-muted-foreground">{"description"}</p>
                     </div>
                 </div>
                 <button
@@ -84,23 +84,20 @@ const ProductPreview = () => {
                 </CardHeader>
                 <CardContent className="product-preview-details-body">
                     <div className="product-preview-detail-grid grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {detailItems.map((item) => {
-                            const Icon = item.icon
-                            return (
-                                <div
-                                    key={item.label}
-                                    className="product-preview-detail-item flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40"
-                                >
-                                    <Icon className="product-preview-detail-item-icon size-4 text-zinc-400" />
-                                    <div className="product-preview-detail-item-text flex flex-col">
-                                        <span className="product-preview-detail-item-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                                            {item.label}
-                                        </span>
-                                        <span className="product-preview-detail-item-value text-sm font-medium">{item.value}</span>
-                                    </div>
+                        {
+                            <div
+                                key={"id"}
+                                className="product-preview-detail-item flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40"
+                            >
+                                <Tag className="product-preview-detail-item-icon size-4 text-zinc-400" />
+                                <div className="product-preview-detail-item-text flex flex-col">
+                                    <span className="product-preview-detail-item-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                                        {"id"}
+                                    </span>
+                                    <span className="product-preview-detail-item-value text-sm font-medium">{"value"}</span>
                                 </div>
-                            )
-                        })}
+                            </div>
+                        }
                     </div>
                 </CardContent>
             </Card>
@@ -121,7 +118,7 @@ const ProductPreview = () => {
             <ProductFormModal
                 open={editOpen}
                 onClose={() => setEditOpen(false)}
-                product={product}
+                product={null}
             />
         </div>
     )

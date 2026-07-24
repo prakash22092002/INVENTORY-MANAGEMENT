@@ -25,10 +25,10 @@ export const createProductRepo = async (data: IProduct): Promise<IProduct> => {
 
 export const getProductsRepo = async (query: IProductQuery): Promise<IProduct[]> => {
 
-    const { page, pageSize, search } = query;
+    const { page = 0, pageSize = 50, search } = query || {};
 
-    const skip = page * pageSize;
-    const limit = pageSize
+    const skip = Number(page) * Number(pageSize);
+    const limit = Number(pageSize);
 
     if (search && search.length > 0) {
         const searchedProducts = await Product.find({
