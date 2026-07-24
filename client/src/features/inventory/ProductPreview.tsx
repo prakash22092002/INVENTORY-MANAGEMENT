@@ -1,15 +1,14 @@
-import { useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+// import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Package, ArrowLeft, Edit, Calendar, Tag, DollarSign, Box, Layers } from 'lucide-react'
+import { Package, ArrowLeft, Edit, Tag, Box } from 'lucide-react'
 
-import ProductFormModal from './ProductFormModal'
+// import ProductFormModal from './ProductFormModal'
 
 const ProductPreview = () => {
-    const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
-    const [editOpen, setEditOpen] = useState(false)
+    // const [editOpen, setEditOpen] = useState(false)
 
 
 
@@ -68,7 +67,7 @@ const ProductPreview = () => {
                     </div>
                 </div>
                 <button
-                    onClick={() => setEditOpen(true)}
+                    // onClick={() => setEditOpen(true)}
                     className="product-preview-edit-btn inline-flex items-center gap-1.5 self-start rounded-xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
                 >
                     <Edit className="product-preview-edit-icon size-4" />
@@ -115,11 +114,11 @@ const ProductPreview = () => {
                     </div>
                 </CardContent>
             </Card>
-            <ProductFormModal
+            {/* <ProductFormModal
                 open={editOpen}
                 onClose={() => setEditOpen(false)}
                 product={null}
-            />
+            /> */}
         </div>
     )
 }
