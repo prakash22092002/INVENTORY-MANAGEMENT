@@ -23,7 +23,7 @@ const addProductValidation = (req: Request, res: Response, next: NextFunction) =
         return;
     }
 
-    if (!stockQuantity || typeof stockQuantity !== 'number' || stockQuantity < 0) {
+    if (typeof stockQuantity !== 'number' || stockQuantity < 0 || stockQuantity === null || stockQuantity === undefined) {
         sendErrorResponse(res, 400, "Please provide a valid stock quantity");
         return;
     }
