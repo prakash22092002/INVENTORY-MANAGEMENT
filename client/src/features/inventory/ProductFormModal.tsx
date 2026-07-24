@@ -82,14 +82,20 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
                 toast.success(response?.data?.message || 'Product created successfully');
                 onSuccess?.();
             } else {
+                console.log('this si the error message ', response)
                 toast.error(response?.data?.message || 'Failed to create product');
             }
 
             setForm(emptyForm)
             onClose()
 
-        } catch (err) {
-            toast.error('Failed to create product');
+        } catch (err: any) {
+            const errorMessage =
+                err.response?.data?.data?.message ||
+                'Failed to create product';
+
+            console.log('Backend error message:', errorMessage);
+            toast.error(errorMessage);
         }
         finally {
             setFormLoader(false)

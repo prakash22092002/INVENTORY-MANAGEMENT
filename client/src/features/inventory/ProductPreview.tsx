@@ -26,16 +26,6 @@ const ProductPreview = () => {
         )
     }
 
-    // const detailItems = [
-    //     { label: 'Product ID', value: product.id, icon: Tag },
-    //     { label: 'SKU', value: product.sku, icon: Layers },
-    //     { label: 'Category', value: product.category, icon: Box },
-    //     { label: 'Price', value: `$${product.price.toFixed(2)}`, icon: DollarSign },
-    //     { label: 'Stock', value: `${product.stock} units`, icon: Box },
-    //     { label: 'Created', value: product.createdAt, icon: Calendar },
-    //     { label: 'Updated', value: product.updatedAt, icon: Calendar },
-    // ]
-
     return (
         <div className="product-preview flex flex-col gap-6">
             <div className="product-preview-back">
