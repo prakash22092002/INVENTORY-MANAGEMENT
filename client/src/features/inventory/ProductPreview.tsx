@@ -10,7 +10,7 @@ import {
     Folder,
     Calendar,
     Clock,
-    DollarSign,
+    IndianRupee,
     Loader2,
     Barcode,
     CheckCircle2,
@@ -211,7 +211,7 @@ const ProductPreview = () => {
                 <Card className="border-zinc-200/50 bg-white/60 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
                     <CardContent className="p-4 flex items-center gap-4">
                         <div className="p-3 rounded-xl bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
-                            <DollarSign className="size-6" />
+                            <IndianRupee className="size-6" />
                         </div>
                         <div>
                             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Unit Price</p>
