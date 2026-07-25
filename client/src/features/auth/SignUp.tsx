@@ -40,6 +40,7 @@ function SignUp() {
             localStorage.setItem("userName", response?.data?.user?.name);
             localStorage.setItem("userEmail", response?.data?.user?.email);
             localStorage.setItem("userName", response?.data?.user?.name);
+            localStorage.setItem("uidx", response?.data?.user?._id)
 
             navigate('/')
 
