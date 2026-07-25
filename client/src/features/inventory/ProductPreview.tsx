@@ -67,8 +67,8 @@ const ProductPreview = () => {
             } else {
                 setProductPreviewData(data.data?.product || null)
             }
-        } catch (error) {
-            toast.error("An error occurred while fetching product")
+        } catch (error: any) {
+            toast.error(error?.response?.data?.data?.message || "An error occurred while fetching product")
         } finally {
             setProductPreviewDataLoading(false)
         }
