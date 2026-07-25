@@ -15,7 +15,9 @@ import {
     Barcode,
     CheckCircle2,
     AlertTriangle,
-    AlertCircle
+    AlertCircle,
+    User,
+    UserCheck
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -41,6 +43,8 @@ export interface ProductPreviewData {
     status?: string
     createdAt?: string
     updatedAt?: string
+    createdBy?: string
+    updatedBy?: string
 }
 
 const ProductPreview = () => {
@@ -131,7 +135,11 @@ const ProductPreview = () => {
         description: productPreviewData.description || '',
         createdAt: productPreviewData.createdAt || '',
         updatedAt: productPreviewData.updatedAt || '',
+        createdBy: productPreviewData.createdBy || '',
+        updatedBy: productPreviewData.updatedBy || '',
     } : undefined
+
+    console.log(productPreviewData, "this is the product preview data")
 
     if (productPreviewDataLoading) {
         return (
@@ -289,6 +297,30 @@ const ProductPreview = () => {
                         </div>
 
                         <div className="flex items-center gap-3 rounded-xl border border-zinc-200/40 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-800/40">
+                            <User className="size-5 text-zinc-500" />
+                            <div className="flex flex-col">
+                                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                                    Created By
+                                </span>
+                                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                                    {productPreviewData.createdBy}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 rounded-xl border border-zinc-200/40 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-800/40">
+                            <UserCheck className="size-5 text-zinc-500" />
+                            <div className="flex flex-col">
+                                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                                    Updated By
+                                </span>
+                                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                                    {productPreviewData.updatedBy}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 rounded-xl border border-zinc-200/40 bg-zinc-50/50 p-3.5 dark:border-zinc-800 dark:bg-zinc-800/40">
                             <Calendar className="size-5 text-zinc-500" />
                             <div className="flex flex-col">
                                 <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -311,6 +343,7 @@ const ProductPreview = () => {
                                 </span>
                             </div>
                         </div>
+
                     </div>
                 </CardContent>
             </Card>

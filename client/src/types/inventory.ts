@@ -11,4 +11,6 @@ export interface Product {
     description: string
     createdAt: string
     updatedAt: string
+    createdBy?: string
+    updatedBy?: string
 }
