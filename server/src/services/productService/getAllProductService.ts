@@ -1,9 +1,9 @@
-import { IProduct, IProductQuery } from "../../models/ProductModal/Product";
+import { IProductQuery, IProductResponse } from "../../models/ProductModal/Product";
 import { getProductsRepo } from "../../repositories/ProductRepository";
 
 
 
-const getAllProductService = async (query: IProductQuery): Promise<IProduct[]> => {
+const getAllProductService = async (query: IProductQuery): Promise<IProductResponse> => {
 
     const { page, pageSize, search } = query
 

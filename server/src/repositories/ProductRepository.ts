@@ -1,4 +1,4 @@
-import { IProduct, IProductQuery, Product } from "../models/ProductModal/Product";
+import { IProduct, IProductQuery, IProductResponse, Product } from "../models/ProductModal/Product";
 
 /**
  * Creates a new product record in the database.
@@ -22,26 +22,30 @@ export const createProductRepo = async (data: IProduct): Promise<IProduct> => {
     return await product.save();
 }
 
-export const getProductsRepo = async (query: IProductQuery): Promise<IProduct[]> => {
+export const getProductsRepo = async (query: IProductQuery): Promise<IProductResponse> => {
 
     const { page = 0, pageSize = 50, search } = query || {};
 
     const skip = Number(page) * Number(pageSize);
     const limit = Number(pageSize);
 
-    if (search && search.length > 0) {
-        const searchedProducts = await Product.find({
+    const filter = (search && search.trim().length > 0)
+        ? {
             $or: [
                 { productName: { $regex: search, $options: "i" } }
             ]
-        }).skip(skip).limit(limit)
+        }
+        : {};
 
-        return searchedProducts
-    }
+    const products = await Product.find(filter).skip(skip).limit(limit);
+    const total = await Product.countDocuments(filter);
 
-    const products = await Product.find().skip(skip).limit(limit);
-
-    return products
+    return {
+        page: Number(page),
+        pageSize: Number(pageSize),
+        total,
+        products
+    };
 
 }
 

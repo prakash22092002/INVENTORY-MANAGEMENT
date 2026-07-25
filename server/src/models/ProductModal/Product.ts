@@ -10,6 +10,13 @@ export interface IProductQuery {
     search?: string
 }
 
+export interface IProductResponse {
+    page: number;
+    pageSize: number;
+    total: number;
+    products: IProduct[];
+}
+
 export interface IProduct extends Document {
     productName: string,
     sku: string,

@@ -10,7 +10,17 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Package, Plus, X, Loader2, Search } from 'lucide-react'
+import {
+    Package,
+    Plus,
+    X,
+    Loader2,
+    Search,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+} from 'lucide-react'
 
 import ProductFormModal from './ProductFormModal'
 import { getAllProductsApi } from '@/services/api/auth'
@@ -24,6 +34,10 @@ const Inventory = () => {
     const [productLoader, setProductLoader] = useState(false)
     const [productData, setProductData] = useState<any[]>([])
 
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
+
     // Search states & refs
     const [search, setSearch] = useState('')
     const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -36,7 +50,7 @@ const Inventory = () => {
         try {
             const payload = {
                 page: 0,
-                pageSize: 50,
+                pageSize: pageSize,
                 search: searchQuery,
             }
 
@@ -66,6 +80,7 @@ const Inventory = () => {
         }
 
         const timer = setTimeout(() => {
+            setCurrentPage(1)
             handleGetAllProducts(search)
         }, 300)
 
@@ -94,6 +109,7 @@ const Inventory = () => {
 
     const handleClearSearch = () => {
         setSearch('')
+        setCurrentPage(1)
         if (!search) {
             setIsSearchOpen(false)
         }
@@ -108,6 +124,11 @@ const Inventory = () => {
         const barcode = (product.barcode || '').toLowerCase()
         return name.includes(term) || sku.includes(term) || category.includes(term) || barcode.includes(term)
     })
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1
+    const startIndex = (currentPage - 1) * pageSize
+    const paginatedProducts = filteredProducts.slice(startIndex, startIndex + pageSize)
 
     return (
         <div className="inventory flex flex-col gap-6">
@@ -206,7 +227,10 @@ const Inventory = () => {
                         </span>
                         {search && (
                             <button
-                                onClick={() => setSearch('')}
+                                onClick={() => {
+                                    setSearch('')
+                                    setCurrentPage(1)
+                                }}
                                 className="inventory-filter-clear-btn flex size-4 items-center justify-center rounded-full transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700"
                             >
                                 <X className="inventory-filter-clear-icon size-3" />
@@ -222,7 +246,7 @@ const Inventory = () => {
                         All Products ({filteredProducts.length})
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="inventory-table-card-body">
+                <CardContent className="inventory-table-card-body p-0">
                     <Table className="inventory-table">
                         <TableHeader className="inventory-table-header">
                             <TableRow className="border-zinc-200/50 dark:border-zinc-700/40">
@@ -244,14 +268,14 @@ const Inventory = () => {
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ) : filteredProducts.length === 0 ? (
+                            ) : paginatedProducts.length === 0 ? (
                                 <TableRow className="inventory-table-empty-row">
                                     <TableCell colSpan={6} className="inventory-table-empty-cell py-12 text-center text-sm text-muted-foreground">
                                         {search ? `No products matching "${search}"` : 'No products found in this Inventory.'}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredProducts.map((product: any) => {
+                                paginatedProducts.map((product: any) => {
                                     const productId = product._id || product.id;
                                     const productName = product.productName || product.name;
                                     const stockQuantity = product.stockQuantity ?? product.stock ?? 0;
@@ -298,6 +322,78 @@ const Inventory = () => {
                             )}
                         </TableBody>
                     </Table>
+
+                    {/* Pagination Controls Footer */}
+                    {filteredProducts.length > 0 && (
+                        <div className="flex flex-col gap-3 px-6 py-4 border-t border-zinc-200/50 dark:border-zinc-700/40 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex flex-wrap items-center gap-4">
+                                <span className="text-xs text-muted-foreground">
+                                    Showing <span className="font-semibold text-zinc-900 dark:text-zinc-100">{startIndex + 1}</span> to{' '}
+                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{Math.min(startIndex + pageSize, filteredProducts.length)}</span> of{' '}
+                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{filteredProducts.length}</span> entries
+                                </span>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">Rows per page:</span>
+                                    <select
+                                        value={pageSize}
+                                        onChange={(e) => {
+                                            setPageSize(Number(e.target.value))
+                                            setCurrentPage(1)
+                                        }}
+                                        className="h-8 rounded-lg border border-zinc-200/80 bg-white/80 px-2 text-xs font-medium text-zinc-900 outline-none hover:border-zinc-300 dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-600"
+                                    >
+                                        <option value={5}>5</option>
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                                <button
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1 || productLoader}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="First Page"
+                                >
+                                    <ChevronsLeft className="size-4" />
+                                </button>
+
+                                <button
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1 || productLoader}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="Previous Page"
+                                >
+                                    <ChevronLeft className="size-4" />
+                                </button>
+
+                                <span className="px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+
+                                <button
+                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages || productLoader}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="Next Page"
+                                >
+                                    <ChevronRight className="size-4" />
+                                </button>
+
+                                <button
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages || productLoader}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="Last Page"
+                                >
+                                    <ChevronsRight className="size-4" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
             <ProductFormModal open={createOpen} onClose={() => setCreateOpen(false)} onSuccess={() => handleGetAllProducts(search)} />
