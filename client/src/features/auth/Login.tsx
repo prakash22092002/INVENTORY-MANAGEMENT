@@ -23,7 +23,7 @@ function Login() {
                 localStorage.setItem('accessToken', res?.data?.user?.accessToken)
                 localStorage.setItem('userName', res?.data?.user?.name)
                 localStorage.setItem('userEmail', res?.data?.user?.email)
-                localStorage.setItem("uidx", res?.data?.user?._id)
+                localStorage.setItem("uidx", res?.data?.user?.id)
             }
 
             toast.success(res.data?.message || 'Logged in successfully!')
