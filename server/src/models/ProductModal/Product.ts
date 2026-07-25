@@ -18,7 +18,9 @@ export interface IProduct extends Document {
     price: number,
     stockQuantity: number,
     description?: string,
-    stockAlert?: string
+    stockAlert?: string,
+    createdBy?: string,
+    updatedBy?: string
 }
 
 const ProductSchema = new Schema<IProduct>(
@@ -58,6 +60,12 @@ const ProductSchema = new Schema<IProduct>(
         },
         stockAlert: {
             type: String
+        },
+        createdBy: {
+            type: String,
+        },
+        updatedBy: {
+            type: String,
         }
     },
     {

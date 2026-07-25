@@ -8,8 +8,8 @@ import getProductByIdService from "../../services/productService/getProductByIdS
 
 export const addProductController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { productName, sku, category, barcode, price, stockQuantity, description } = req.body;
-        const product = await addProductService({ productName, sku, category, barcode, price, stockQuantity, description });
+        const { productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy } = req.body;
+        const product = await addProductService({ productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy });
         sendSuccessResponse(res, 201, 'Product added successfully', {
             product
         });

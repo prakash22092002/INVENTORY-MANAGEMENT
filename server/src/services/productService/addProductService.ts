@@ -3,7 +3,7 @@ import { createProductRepo } from "../../repositories/ProductRepository";
 
 const addProductService = async (data: Partial<IProduct>): Promise<IProduct> => {
 
-    const { productName, sku, category, barcode, price, stockQuantity, description } = data;
+    const { productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy } = data;
 
     if (productName === undefined || sku === undefined || category === undefined || barcode === undefined || price === undefined || stockQuantity === undefined || description === undefined) {
         throw new Error("Please provide all the fields");
@@ -20,7 +20,9 @@ const addProductService = async (data: Partial<IProduct>): Promise<IProduct> => 
         barcode,
         price,
         stockQuantity,
-        description
+        description,
+        createdBy,
+        updatedBy
     } as IProduct);
 
     return savedProduct;
