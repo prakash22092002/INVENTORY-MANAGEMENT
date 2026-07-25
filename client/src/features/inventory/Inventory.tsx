@@ -33,6 +33,7 @@ const Inventory = () => {
 
     const [productLoader, setProductLoader] = useState(false)
     const [productData, setProductData] = useState<any[]>([])
+    const [totalProducts, setTotalProducts] = useState(0)
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1)
@@ -45,25 +46,33 @@ const Inventory = () => {
     const inputRef = useRef<HTMLInputElement>(null)
     const isInitialMount = useRef(true)
 
-    const handleGetAllProducts = async (searchQuery: string = search) => {
+    const handleGetAllProducts = async (
+        pageNum: number = currentPage,
+        size: number = pageSize,
+        searchQuery: string = search
+    ) => {
         setProductLoader(true)
         try {
             const payload = {
-                page: 0,
-                pageSize: pageSize,
+                page: pageNum - 1,
+                pageSize: size,
                 search: searchQuery,
             }
 
             const response = await getAllProductsApi(payload)
 
-            if (response.es === 0 && response.data?.products) {
-                setProductData(response.data.products)
+            if (response.es === 0 && response.data) {
+                setProductData(response.data.products || [])
+                setTotalProducts(response.data.total ?? 0)
             } else if (Array.isArray(response.data)) {
                 setProductData(response.data)
+                setTotalProducts(response.data.length)
             } else if (Array.isArray(response)) {
                 setProductData(response)
+                setTotalProducts(response.length)
             } else {
                 setProductData([])
+                setTotalProducts(0)
             }
         } catch (error: any) {
             toast.error(error?.response?.data?.message || 'An error occurred while fetching products')
@@ -71,21 +80,20 @@ const Inventory = () => {
         setProductLoader(false)
     }
 
-    // Debounced search effect
+    // Effect to refetch products whenever currentPage, pageSize, or search changes
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false
-            handleGetAllProducts('')
+            handleGetAllProducts(1, pageSize, '')
             return
         }
 
         const timer = setTimeout(() => {
-            setCurrentPage(1)
-            handleGetAllProducts(search)
+            handleGetAllProducts(currentPage, pageSize, search)
         }, 300)
 
         return () => clearTimeout(timer)
-    }, [search])
+    }, [currentPage, pageSize, search])
 
     // Click outside to collapse if empty
     useEffect(() => {
@@ -115,20 +123,9 @@ const Inventory = () => {
         }
     }
 
-    const filteredProducts = productData.filter((product: any) => {
-        if (!search) return true
-        const term = search.toLowerCase()
-        const name = (product.productName || product.name || '').toLowerCase()
-        const sku = (product.sku || '').toLowerCase()
-        const category = (product.category || '').toLowerCase()
-        const barcode = (product.barcode || '').toLowerCase()
-        return name.includes(term) || sku.includes(term) || category.includes(term) || barcode.includes(term)
-    })
-
-    // Pagination calculations
-    const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1
+    // Server-side pagination calculations
+    const totalPages = Math.ceil(totalProducts / pageSize) || 1
     const startIndex = (currentPage - 1) * pageSize
-    const paginatedProducts = filteredProducts.slice(startIndex, startIndex + pageSize)
 
     return (
         <div className="inventory flex flex-col gap-6">
@@ -215,7 +212,7 @@ const Inventory = () => {
                 </div>
             </div>
 
-            {(productData.length > 0 || search) && (
+            {(totalProducts > 0 || search) && (
                 <div className="inventory-filter-bar flex items-center gap-2 flex-wrap">
                     <span className="inventory-filter-label text-sm text-muted-foreground">Filtered by:</span>
                     <Badge
@@ -243,7 +240,7 @@ const Inventory = () => {
             <Card className="inventory-table-card border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
                 <CardHeader className="inventory-table-card-header">
                     <CardTitle className="inventory-table-card-title text-sm font-semibold">
-                        All Products ({filteredProducts.length})
+                        All Products ({totalProducts})
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="inventory-table-card-body p-0">
@@ -268,14 +265,14 @@ const Inventory = () => {
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ) : paginatedProducts.length === 0 ? (
+                            ) : productData.length === 0 ? (
                                 <TableRow className="inventory-table-empty-row">
                                     <TableCell colSpan={6} className="inventory-table-empty-cell py-12 text-center text-sm text-muted-foreground">
                                         {search ? `No products matching "${search}"` : 'No products found in this Inventory.'}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                paginatedProducts.map((product: any) => {
+                                productData.map((product: any) => {
                                     const productId = product._id || product.id;
                                     const productName = product.productName || product.name;
                                     const stockQuantity = product.stockQuantity ?? product.stock ?? 0;
@@ -324,13 +321,13 @@ const Inventory = () => {
                     </Table>
 
                     {/* Pagination Controls Footer */}
-                    {filteredProducts.length > 0 && (
+                    {totalProducts > 0 && (
                         <div className="flex flex-col gap-3 px-6 py-4 border-t border-zinc-200/50 dark:border-zinc-700/40 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex flex-wrap items-center gap-4">
                                 <span className="text-xs text-muted-foreground">
-                                    Showing <span className="font-semibold text-zinc-900 dark:text-zinc-100">{startIndex + 1}</span> to{' '}
-                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{Math.min(startIndex + pageSize, filteredProducts.length)}</span> of{' '}
-                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{filteredProducts.length}</span> entries
+                                    Showing <span className="font-semibold text-zinc-900 dark:text-zinc-100">{totalProducts > 0 ? startIndex + 1 : 0}</span> to{' '}
+                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{Math.min(startIndex + productData.length, totalProducts)}</span> of{' '}
+                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{totalProducts}</span> entries
                                 </span>
 
                                 <div className="flex items-center gap-2">
@@ -396,7 +393,7 @@ const Inventory = () => {
                     )}
                 </CardContent>
             </Card>
-            <ProductFormModal open={createOpen} onClose={() => setCreateOpen(false)} onSuccess={() => handleGetAllProducts(search)} />
+            <ProductFormModal open={createOpen} onClose={() => setCreateOpen(false)} onSuccess={() => handleGetAllProducts(currentPage, pageSize, search)} />
         </div>
     )
 }
