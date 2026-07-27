@@ -28,6 +28,7 @@ export interface IProduct extends Document {
     stockAlert?: string,
     createdBy?: string,
     updatedBy?: string
+    productId?: string
 }
 
 const ProductSchema = new Schema<IProduct>(

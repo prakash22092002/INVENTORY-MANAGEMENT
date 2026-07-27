@@ -4,6 +4,7 @@ import { sendErrorResponse, sendSuccessResponse } from "../../utils/responseHelp
 import addProductService from "../../services/productService/addProductService";
 import getAllProductService from "../../services/productService/getAllProductService";
 import getProductByIdService from "../../services/productService/getProductByIdService";
+import editProductService from "../../services/productService/editProductService";
 
 
 export const addProductController = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,6 +16,19 @@ export const addProductController = async (req: Request, res: Response, next: Ne
         });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Internal Server Error';
+        sendErrorResponse(res, 400, message);
+    }
+}
+
+export const editProductController = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { productId, productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy } = req.body
+        const product = await editProductService(req.body)
+        sendSuccessResponse(res, 200, 'Product updated successfully', {
+            product
+        });
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
         sendErrorResponse(res, 400, message);
     }
 }

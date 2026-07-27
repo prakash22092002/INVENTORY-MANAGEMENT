@@ -49,6 +49,24 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProductRes
 
 }
 
+export const editProductRepo = async (productId: string, data: Partial<IProduct>): Promise<IProduct | null> => {
+    const product = await Product.findById(productId)
+    if (!product) {
+        return null
+    }
+
+    if (data.stockQuantity && data.stockQuantity > 20) {
+        product.stockAlert = "in_stock";
+    }
+    else if (data.stockQuantity && data.stockQuantity <= 20 && data.stockQuantity >= 1) {
+        product.stockAlert = "low_stock";
+    }
+    else {
+        product.stockAlert = "out_of_stock";
+    }
+    return await product.save();
+}
+
 export const getProductByIdRepo = async (productId: string): Promise<IProduct | null> => {
 
     const product = await Product.findById(productId);
