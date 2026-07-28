@@ -81,20 +81,5 @@ const updateCustomerValidation = (req: Request, res: Response, next: NextFunctio
     next();
 }
 
-const deleteCustomerValidation = (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-
-    if (!id || typeof id !== 'string' || id.length !== 24) {
-        sendErrorResponse(res, 400, "Please provide a valid customer ID");
-        return;
-    }
-
-    next();
-}
-
-const getAllCustomerValidation = (req: Request, res: Response, next: NextFunction) => {
-
-    next();
-}
 
 export default addCustomerValidation;
