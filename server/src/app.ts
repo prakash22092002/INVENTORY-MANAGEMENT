@@ -7,6 +7,7 @@ import morgan from 'morgan';
 // Route Imports
 import userRoutes from './routes/userRoutes';
 import productRoutes from './routes/productRoutes/productsRoutes'
+import customerRoutes from './routes/customerRoutes/customerRoutes'
 
 const app = express();
 
@@ -38,7 +39,10 @@ app.get("/", (req, res) => {
 
 // API Routes Mounting
 app.use('/api/users', userRoutes);
+
 app.use('/api/product', productRoutes);
+
+app.use('/api/customer', customerRoutes)
 
 // 404 Handler
 app.use((req, res) => {
