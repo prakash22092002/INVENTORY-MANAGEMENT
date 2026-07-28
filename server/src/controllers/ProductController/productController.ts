@@ -5,6 +5,7 @@ import addProductService from "../../services/productService/addProductService";
 import getAllProductService from "../../services/productService/getAllProductService";
 import getProductByIdService from "../../services/productService/getProductByIdService";
 import editProductService from "../../services/productService/editProductService";
+import { deleteProductService } from "../../services/productService/deleteProductService";
 
 
 export const addProductController = async (req: Request, res: Response, next: NextFunction) => {
@@ -70,6 +71,25 @@ export const getProductByIdController = async (req: Request, res: Response, next
             product
         });
 
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        sendErrorResponse(res, 400, message);
+    }
+}
+
+export const deleteProductController = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { productId } = req.params;
+
+        if (!productId || typeof productId !== 'string') {
+            sendErrorResponse(res, 400, 'Product ID is required');
+            return;
+        }
+
+        const product = await deleteProductService(productId);
+        sendSuccessResponse(res, 200, 'Product deleted successfully', {
+            product
+        });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Internal Server Error';
         sendErrorResponse(res, 400, message);
