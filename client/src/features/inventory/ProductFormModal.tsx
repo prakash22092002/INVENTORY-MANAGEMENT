@@ -71,8 +71,6 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
 
             if (isEdit) {
 
-                debugger;
-
                 const editFormdata: EditProductPayload = {
                     productId: product?.id,
                     productName: form.name,
