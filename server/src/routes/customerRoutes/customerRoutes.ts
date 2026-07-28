@@ -1,6 +1,6 @@
 import { Router } from "express";
-import addCustomerValidation from "../../validations/customerValidation/addCustomerValidation";
 import { addCustomerController } from "../../controllers/CustomerController/CustomerController";
+import { addCustomerValidation } from "../../validations/customerValidation/addCustomerValidation";
 
 const router = Router();
 

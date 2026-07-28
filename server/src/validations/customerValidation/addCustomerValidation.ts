@@ -81,5 +81,15 @@ const updateCustomerValidation = (req: Request, res: Response, next: NextFunctio
     next();
 }
 
+const deleteCustomerValidation = (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
 
-export default addCustomerValidation;
+    if (!id || typeof id !== 'string' || id.length !== 24) {
+        sendErrorResponse(res, 400, "Please provide a valid customer ID");
+        return;
+    }
+
+    next();
+}
+
+export { addCustomerValidation, getCustomerValidation, updateCustomerValidation, deleteCustomerValidation };
