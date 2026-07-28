@@ -16,7 +16,7 @@ const addCustomerValidation = (req: Request, res: Response, next: NextFunction) 
         return;
     }
 
-    if (mobileNumber && typeof mobileNumber !== 'number' || mobileNumber?.toString().length < 10 || mobileNumber?.toString().length > 15) {
+    if (!mobileNumber || typeof mobileNumber !== 'string' || mobileNumber?.length < 10 || mobileNumber?.length > 15) {
         sendErrorResponse(res, 400, "Please provide a valid phone number");
         return;
     }

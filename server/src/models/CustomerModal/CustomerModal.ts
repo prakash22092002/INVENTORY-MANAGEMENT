@@ -15,7 +15,7 @@ export interface ICustomerResponse {
 
 export interface ICustomer extends Document {
     customerName: string;
-    mobileNumber: number;
+    mobileNumber: string;
     email: string;
     companyName: string;
     address: string;
@@ -34,7 +34,7 @@ const CustomerSchema = new Schema<ICustomer>(
             trim: true
         },
         mobileNumber: {
-            type: Number,
+            type: String,
             required: [true, 'Mobile number is required']
         },
         email: {
