@@ -14,10 +14,12 @@ import { Users, Plus } from 'lucide-react'
 import { mockCustomers, customerStatusVariant } from '@/data/customers'
 import type { Customer } from '@/types/customer'
 import CustomerFormModal, { type CustomerFormData } from './CustomerFormModal'
+import SearchBar from '@/components/common/SearchBar'
 
 const Customers = () => {
     const navigate = useNavigate()
     const [customers, setCustomers] = useState<Customer[]>(mockCustomers)
+    const [search, setSearch] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
 
     const handleAddCustomerSubmit = (data: CustomerFormData) => {
@@ -43,9 +45,20 @@ const Customers = () => {
         setCustomers([newCustomer, ...customers])
     }
 
+    const filteredCustomers = customers.filter((customer) => {
+        if (!search.trim()) return true
+        const query = search.toLowerCase()
+        return (
+            customer.name.toLowerCase().includes(query) ||
+            customer.email.toLowerCase().includes(query) ||
+            customer.company.toLowerCase().includes(query) ||
+            customer.phone.includes(query)
+        )
+    })
+
     return (
         <div className="customers flex flex-col gap-6">
-            <div className="customers-header flex items-center justify-between">
+            <div className="customers-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="customers-header-info flex flex-col gap-1">
                     <h1 className="customers-header-title text-2xl font-semibold tracking-tight sm:text-3xl">
                         Customers
@@ -54,13 +67,23 @@ const Customers = () => {
                         View and manage your customer relationships.
                     </p>
                 </div>
-                <button
-                    onClick={() => setModalOpen(true)}
-                    className="customers-create-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
-                >
-                    <Plus className="customers-create-btn-icon size-4" />
-                    Add Customer
-                </button>
+
+                <div className="flex items-center gap-3 self-end sm:self-auto">
+                    <SearchBar
+                        value={search}
+                        onChange={setSearch}
+                        onClear={() => setSearch('')}
+                        placeholder="Search by customer name..."
+                    />
+
+                    <button
+                        onClick={() => setModalOpen(true)}
+                        className="customers-create-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
+                    >
+                        <Plus className="customers-create-btn-icon size-4" />
+                        Add Customer
+                    </button>
+                </div>
             </div>
 
             <Card className="customers-table-card border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
@@ -82,14 +105,14 @@ const Customers = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody className="customers-table-body">
-                            {customers.length === 0 ? (
+                            {filteredCustomers.length === 0 ? (
                                 <TableRow className="customers-table-empty-row">
                                     <TableCell colSpan={6} className="customers-table-empty-cell py-12 text-center text-sm text-muted-foreground">
                                         No customers found.
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                customers.map((customer) => (
+                                filteredCustomers.map((customer) => (
                                     <TableRow
                                         key={customer.id}
                                         onClick={() => navigate(`/customers/${customer.id}`)}
