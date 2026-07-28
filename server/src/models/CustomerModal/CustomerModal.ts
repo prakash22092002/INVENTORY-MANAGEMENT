@@ -1,5 +1,18 @@
 import { Document, model, Schema } from "mongoose";
 
+export interface ICustomerQuery {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+}
+
+export interface ICustomerResponse {
+    page: number;
+    pageSize: number;
+    total: number;
+    customers: ICustomer[];
+}
+
 export interface ICustomer extends Document {
     customerName: string;
     mobileNumber: number;
