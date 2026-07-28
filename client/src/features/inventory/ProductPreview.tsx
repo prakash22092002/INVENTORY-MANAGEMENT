@@ -17,12 +17,13 @@ import {
     AlertTriangle,
     AlertCircle,
     User,
-    UserCheck
+    UserCheck,
+    Trash2
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import ProductFormModal from './ProductFormModal'
-import { getProductByIdApi } from '@/services/api/auth'
+import { getProductByIdApi, deleteProductByIdApi } from '@/services/api/auth'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import type { Product as ModalProduct } from '@/types/inventory'
@@ -54,6 +55,7 @@ const ProductPreview = () => {
 
     const [productPreviewData, setProductPreviewData] = useState<ProductPreviewData | null>(null)
     const [productPreviewDataLoading, setProductPreviewDataLoading] = useState(true)
+    const [deleteLoading, setDeleteLoading] = useState(false)
 
     const fetchProductPreviewData = async () => {
         try {
@@ -75,6 +77,24 @@ const ProductPreview = () => {
             toast.error(error?.response?.data?.data?.message || "An error occurred while fetching product")
         } finally {
             setProductPreviewDataLoading(false)
+        }
+    }
+
+    const handleDeleteProduct = async () => {
+        if (!id) return
+        try {
+            setDeleteLoading(true)
+            const response = await deleteProductByIdApi(id)
+            if (response.es === 0 || response.status === 200 || response.message) {
+                toast.success(response.message || "Product deleted successfully")
+                navigate(-1)
+            } else {
+                toast.error(response.data?.message || "Failed to delete product")
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "An error occurred while deleting product")
+        } finally {
+            setDeleteLoading(false)
         }
     }
 
@@ -197,13 +217,27 @@ const ProductPreview = () => {
                         </p>
                     </div>
                 </div>
-                <button
-                    onClick={() => setEditOpen(true)}
-                    className="product-preview-edit-btn inline-flex items-center gap-1.5 self-start rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm"
-                >
-                    <Edit className="product-preview-edit-icon size-4" />
-                    Edit Product
-                </button>
+                <div className="flex items-center gap-2 self-start">
+                    <button
+                        onClick={() => setEditOpen(true)}
+                        className="product-preview-edit-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm"
+                    >
+                        <Edit className="product-preview-edit-icon size-4" />
+                        Edit Product
+                    </button>
+                    <button
+                        onClick={handleDeleteProduct}
+                        disabled={deleteLoading}
+                        className="product-preview-delete-btn inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50 shadow-sm"
+                    >
+                        {deleteLoading ? (
+                            <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                            <Trash2 className="size-4" />
+                        )}
+
+                    </button>
+                </div>
             </div>
 
             {/* Quick Stats Grid */}

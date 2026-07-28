@@ -30,3 +30,9 @@ export const getProductByIdApi = async (productId: string) => {
     const response = await api.get(`/api/product/${productId}`);
     return response.data;
 }
+
+export const deleteProductByIdApi = async (productId: string) => {
+    const response = await api.get(`/api/product/delete/${productId}`);
+    return response.data;
+}
+
