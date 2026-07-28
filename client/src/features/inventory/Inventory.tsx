@@ -15,7 +15,6 @@ import {
     Plus,
     X,
     Loader2,
-    Search,
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
@@ -25,7 +24,6 @@ import {
 import ProductFormModal from './ProductFormModal'
 import { getAllProductsApi } from '@/services/api/auth'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
 import SearchBar from '@/components/common/SearchBar'
 
 const Inventory = () => {
