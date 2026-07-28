@@ -35,3 +35,16 @@ export interface CreateProductPayload {
     stockQuantity: number,
     description: string
 }
+
+export interface EditProductPayload {
+    productId: string,
+    productName: string,
+    sku: string,
+    category: string,
+    barcode: string,
+    price: number,
+    stockQuantity: number,
+    description: string,
+    createdBy: string | null,
+    updatedBy: string | null
+}

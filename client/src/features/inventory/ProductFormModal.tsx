@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Product } from '@/types/inventory'
-import type { CreateProductPayload } from '@/types/auth'
+import type { CreateProductPayload, EditProductPayload } from '@/types/auth'
 import { toast } from 'sonner'
-import { createProductApi } from '@/services/api/auth'
+import { createProductApi, editProductApi } from '@/services/api/auth'
 
 const categories = ['Electronics', 'Accessories', 'Peripherals', 'Cables', 'Storage']
 
@@ -39,6 +39,9 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
     const [form, setForm] = useState<ProductFormData>(emptyForm)
     const [formLoader, setFormLoader] = useState<boolean>(false)
 
+    const updatedBy = localStorage.getItem('userName');
+
+
     useEffect(() => {
         if (product) {
             setForm({
@@ -66,26 +69,56 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
             e.preventDefault()
             setFormLoader(true)
 
-            const formData: CreateProductPayload = {
-                productName: form.name,
-                sku: form.sku,
-                category: form.category,
-                barcode: form.barcode,
-                price: parseFloat(form.price),
-                stockQuantity: parseInt(form.stock),
-                description: form.description,
-            }
+            if (isEdit) {
 
-            const response = await createProductApi(formData);
+                debugger;
 
-            if (response?.es === 0) {
-                toast.success(response?.data?.message || 'Product created successfully');
-                onSuccess?.();
+                const editFormdata: EditProductPayload = {
+                    productId: product?.id,
+                    productName: form.name,
+                    sku: form.sku,
+                    category: form.category,
+                    barcode: form.barcode,
+                    price: parseFloat(form.price),
+                    stockQuantity: parseInt(form.stock),
+                    description: form.description,
+                    createdBy: product?.createdBy || '',
+                    updatedBy: updatedBy,
+                }
+
+                const response = await editProductApi(editFormdata);
+
+                if (response?.es === 0) {
+                    toast.success(response?.data?.message || 'Product updated successfully');
+                    onSuccess?.();
+                } else {
+                    toast.error(response?.data?.message || 'Failed to update product');
+                }
+
             } else {
-                toast.error(response?.data?.message || 'Failed to create product');
+
+                const formData: CreateProductPayload = {
+                    productName: form.name,
+                    sku: form.sku,
+                    category: form.category,
+                    barcode: form.barcode,
+                    price: parseFloat(form.price),
+                    stockQuantity: parseInt(form.stock),
+                    description: form.description,
+                }
+
+                const response = await createProductApi(formData);
+
+                if (response?.es === 0) {
+                    toast.success(response?.data?.message || 'Product created successfully');
+                    onSuccess?.();
+                } else {
+                    toast.error(response?.data?.message || 'Failed to create product');
+                }
+
+                setForm(emptyForm)
             }
 
-            setForm(emptyForm)
             onClose()
 
         } catch (err: any) {

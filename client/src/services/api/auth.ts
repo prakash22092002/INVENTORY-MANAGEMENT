@@ -1,5 +1,5 @@
 import api from './axios'
-import type { SignUpPayload, LoginPayload, GetAllPaymentPayload, CreateProductPayload } from '@/types/auth'
+import type { SignUpPayload, LoginPayload, GetAllPaymentPayload, CreateProductPayload, EditProductPayload } from '@/types/auth'
 
 export const signUpApi = async (payload: SignUpPayload) => {
     const response = await api.post('/api/users/signup', payload)
@@ -18,6 +18,11 @@ export const getAllProductsApi = async (payload: GetAllPaymentPayload) => {
 
 export const createProductApi = async (payload: CreateProductPayload) => {
     const response = await api.post('/api/product/add', payload);
+    return response.data;
+}
+
+export const editProductApi = async (payload: EditProductPayload) => {
+    const response = await api.post('/api/product/edit', payload);
     return response.data;
 }
 
