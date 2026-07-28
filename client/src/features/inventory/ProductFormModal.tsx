@@ -6,7 +6,7 @@ import type { CreateProductPayload, EditProductPayload } from '@/types/auth'
 import { toast } from 'sonner'
 import { createProductApi, editProductApi } from '@/services/api/auth'
 
-const categories = ['Electronics', 'Accessories', 'Peripherals', 'Cables', 'Storage']
+const categories = ['Oil', 'Powder', 'Fruits', 'Vegetables']
 
 type ProductFormData = {
     name: string
@@ -28,7 +28,7 @@ type ProductFormModalProps = {
 const emptyForm: ProductFormData = {
     name: '',
     sku: '',
-    category: 'Electronics',
+    category: 'Oil',
     price: '',
     stock: '',
     barcode: '',
