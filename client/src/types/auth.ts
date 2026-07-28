@@ -33,7 +33,9 @@ export interface CreateProductPayload {
     barcode: string,
     price: number,
     stockQuantity: number,
-    description: string
+    description: string,
+    createdBy: string | null,
+    updatedBy: string | null
 }
 
 export interface EditProductPayload {

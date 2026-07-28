@@ -103,6 +103,8 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
                     price: parseFloat(form.price),
                     stockQuantity: parseInt(form.stock),
                     description: form.description,
+                    createdBy: localStorage.getItem("userName"),
+                    updatedBy: localStorage.getItem("userName")
                 }
 
                 const response = await createProductApi(formData);
