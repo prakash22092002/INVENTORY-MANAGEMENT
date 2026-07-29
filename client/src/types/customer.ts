@@ -1,19 +1,16 @@
 export interface Customer {
-    id: string
-    name: string
-    email: string
-    phone: string
-    company: string
-    totalOrders: number
-    totalSpent: number
-    status: 'Active' | 'Inactive'
-    joinDate: string
-    lastOrderDate: string
-    address: string
+    customerName: string,
+    mobileNumber: string,
+    email: string,
+    companyName: string,
+    address: string,
+    country: string,
+    state: string,
     city: string
-    country: string
-    state?: string
-    pincode?: string
-    vatNumber?: string
+    pinCode: string,
+    pan: string,
+    _id?: string,
+    createdAt?: string,
+    updatedAt?: string,
 }
 

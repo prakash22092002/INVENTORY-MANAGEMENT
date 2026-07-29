@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Customer } from '@/types/customer'
 
 export type CustomerFormData = {
-    name: string
-    phone: string
+    customerName: string
+    mobileNumber: string
     email: string
-    company: string
+    companyName: string
     address: string
     country: string
     state: string
     city: string
     pincode: string
-    vatNumber: string
-    status: 'Active' | 'Inactive'
+    pan: string
+    createdBy?: string
+    updatedBy?: string
 }
 
 type CustomerFormModalProps = {
@@ -22,39 +23,40 @@ type CustomerFormModalProps = {
     onClose: () => void
     onSubmit: (data: CustomerFormData) => void
     customer?: Customer
+    loading?: boolean
 }
 
 const emptyForm: CustomerFormData = {
-    name: '',
-    phone: '',
+    customerName: '',
+    mobileNumber: '',
     email: '',
-    company: '',
+    companyName: '',
     address: '',
     country: '',
     state: '',
     city: '',
     pincode: '',
-    vatNumber: '',
-    status: 'Active',
+    pan: '',
+    createdBy: '',
+    updatedBy: '',
 }
 
-const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormModalProps) => {
+const CustomerFormModal = ({ open, onClose, onSubmit, customer, loading = false }: CustomerFormModalProps) => {
     const [form, setForm] = useState<CustomerFormData>(emptyForm)
 
     useEffect(() => {
         if (customer) {
             setForm({
-                name: customer.name || '',
-                phone: customer.phone || '',
+                customerName: customer.customerName || '',
+                mobileNumber: customer.mobileNumber || '',
                 email: customer.email || '',
-                company: customer.company || '',
+                companyName: customer.companyName || '',
                 address: customer.address || '',
                 country: customer.country || '',
                 state: customer.state || '',
                 city: customer.city || '',
-                pincode: customer.pincode || '',
-                vatNumber: customer.vatNumber || '',
-                status: customer.status || 'Active',
+                pincode: customer.pinCode || '',
+                pan: customer.pan || '',
             })
         } else {
             setForm(emptyForm)
@@ -65,10 +67,13 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
         setForm((prev) => ({ ...prev, [field]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+
+
         onSubmit(form)
-        onClose()
+        // onClose()
     }
 
     const isEdit = !!customer
@@ -107,8 +112,8 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
                             </label>
                             <input
                                 type="text"
-                                value={form.name}
-                                onChange={(e) => handleChange('name', e.target.value)}
+                                value={form.customerName}
+                                onChange={(e) => handleChange('customerName', e.target.value)}
                                 required
                                 className="customer-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-50 dark:focus:border-zinc-500"
                                 placeholder="E.g., John Doe"
@@ -121,8 +126,8 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
                             </label>
                             <input
                                 type="tel"
-                                value={form.phone}
-                                onChange={(e) => handleChange('phone', e.target.value)}
+                                value={form.mobileNumber}
+                                onChange={(e) => handleChange('mobileNumber', e.target.value)}
                                 required
                                 className="customer-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-50 dark:focus:border-zinc-500"
                                 placeholder="E.g., +1 (555) 000-0000"
@@ -149,8 +154,8 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
                             </label>
                             <input
                                 type="text"
-                                value={form.company}
-                                onChange={(e) => handleChange('company', e.target.value)}
+                                value={form.companyName}
+                                onChange={(e) => handleChange('companyName', e.target.value)}
                                 className="customer-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-50 dark:focus:border-zinc-500"
                                 placeholder="E.g., Acme Corp (Optional)"
                             />
@@ -236,8 +241,8 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
                             </label>
                             <input
                                 type="text"
-                                value={form.vatNumber}
-                                onChange={(e) => handleChange('vatNumber', e.target.value)}
+                                value={form.pan}
+                                onChange={(e) => handleChange('pan', e.target.value)}
                                 required
                                 className="customer-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-50 dark:focus:border-zinc-500"
                                 placeholder="E.g., VAT123456789"
@@ -245,7 +250,7 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
                         </div>
                     </div>
 
-                    {isEdit && (
+                    {/* {isEdit && (
                         <div className="customer-form-modal-field flex flex-col gap-1.5">
                             <label className="customer-form-modal-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                                 Status
@@ -259,7 +264,7 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
                                 <option value="Inactive">Inactive</option>
                             </select>
                         </div>
-                    )}
+                    )} */}
 
                     <div className="customer-form-modal-actions flex items-center justify-end gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
                         <button
@@ -271,8 +276,10 @@ const CustomerFormModal = ({ open, onClose, onSubmit, customer }: CustomerFormMo
                         </button>
                         <button
                             type="submit"
-                            className="customer-form-modal-submit-btn rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
+                            disabled={loading}
+                            className="customer-form-modal-submit-btn inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
                         >
+                            {loading && <Loader2 className="size-4 animate-spin text-white dark:text-zinc-800" />}
                             {isEdit ? 'Save Changes' : 'Create Customer'}
                         </button>
                     </div>

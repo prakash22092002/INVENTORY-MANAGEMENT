@@ -1,3 +1,4 @@
+import type { Customer } from '@/types/customer'
 import api from './axios'
 import type { SignUpPayload, LoginPayload, GetAllPaymentPayload, CreateProductPayload, EditProductPayload } from '@/types/auth'
 
@@ -36,3 +37,12 @@ export const deleteProductByIdApi = async (productId: string) => {
     return response.data;
 }
 
+export const addCustomerApi = async (payload: Customer) => {
+    const response = await api.post(`/api/customer/add`, payload);
+    return response.data;
+}
+
+export const getAllCustomerApi = async (payload: { page: number; pageSize?: number; limit?: number; search: string; }) => {
+    const response = await api.post(`/api/customer`, payload);
+    return response.data;
+}

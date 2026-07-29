@@ -1,22 +1,28 @@
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Users, ArrowLeft, Mail, Phone, MapPin, Building, Calendar, ShoppingCart, DollarSign } from 'lucide-react'
-import { mockCustomers, customerStatusVariant } from '@/data/customers'
+import { Users, ArrowLeft, Mail, Phone, MapPin, Building, FileText } from 'lucide-react'
+import { useState } from 'react'
+import type { Customer } from '@/types/customer'
 
 const CustomerPreview = () => {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
 
-    const customer = mockCustomers.find((c) => c.id === id)
+    const [customer] = useState<Customer | null>(null)
 
     if (!customer) {
         return (
             <div className="customer-preview-not-found flex flex-col items-center justify-center gap-4 py-24">
                 <Users className="customer-preview-not-found-icon size-12 text-zinc-300" />
                 <h2 className="customer-preview-not-found-title text-lg font-semibold">Customer not found</h2>
-                <p className="customer-preview-not-found-desc text-sm text-muted-foreground">The customer you're looking for doesn't exist.</p>
-                <Link to="/customers" className="customer-preview-not-found-link inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200">
+                <p className="customer-preview-not-found-desc text-sm text-muted-foreground">
+                    The customer preview for ID "{id || 'N/A'}" could not be found.
+                </p>
+                <Link
+                    to="/customers"
+                    className="customer-preview-not-found-link inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                >
                     <ArrowLeft className="size-4" />
                     Back to Customers
                 </Link>
@@ -25,14 +31,12 @@ const CustomerPreview = () => {
     }
 
     const detailItems = [
-        { label: 'Customer ID', value: customer.id, icon: Users },
-        { label: 'Email', value: customer.email, icon: Mail },
-        { label: 'Phone', value: customer.phone, icon: Phone },
-        { label: 'Company', value: customer.company, icon: Building },
-        { label: 'Total Orders', value: customer.totalOrders.toString(), icon: ShoppingCart },
-        { label: 'Total Spent', value: `$${customer.totalSpent.toFixed(2)}`, icon: DollarSign },
-        { label: 'Joined', value: customer.joinDate, icon: Calendar },
-        { label: 'Last Order', value: customer.lastOrderDate, icon: Calendar },
+        { label: 'Customer Name', value: customer.customerName || 'N/A', icon: Users },
+        { label: 'Email', value: customer.email || 'N/A', icon: Mail },
+        { label: 'Mobile Number', value: customer.mobileNumber || 'N/A', icon: Phone },
+        { label: 'Company Name', value: customer.companyName || 'N/A', icon: Building },
+        { label: 'PAN Card Number', value: customer.pan || 'N/A', icon: FileText },
+        { label: 'Pin Code', value: customer.pinCode || 'N/A', icon: MapPin },
     ]
 
     return (
@@ -54,16 +58,18 @@ const CustomerPreview = () => {
                     </div>
                     <div className="customer-preview-hero-text flex flex-col gap-1.5">
                         <div className="customer-preview-hero-title-row flex items-center gap-2.5">
-                            <h1 className="customer-preview-hero-name text-xl font-semibold tracking-tight sm:text-2xl">{customer.name}</h1>
+                            <h1 className="customer-preview-hero-name text-xl font-semibold tracking-tight sm:text-2xl">
+                                {customer.customerName}
+                            </h1>
                             <Badge
-                                variant={customerStatusVariant[customer.status]}
+                                variant="default"
                                 className="customer-preview-hero-badge rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
                             >
-                                {customer.status}
+                                Active
                             </Badge>
                         </div>
                         <p className="customer-preview-hero-desc text-sm text-muted-foreground">
-                            {customer.company} &middot; {customer.city}, {customer.country}
+                            {customer.companyName} &middot; {customer.city}, {customer.country}
                         </p>
                     </div>
                 </div>
@@ -111,7 +117,7 @@ const CustomerPreview = () => {
                             <div className="customer-preview-address-text flex flex-col gap-0.5">
                                 <span className="customer-preview-address-line text-sm">{customer.address}</span>
                                 <span className="customer-preview-address-city text-sm text-muted-foreground">
-                                    {customer.city}, {customer.country}
+                                    {customer.city}, {customer.state}, {customer.country} - {customer.pinCode}
                                 </span>
                             </div>
                         </div>
