@@ -38,3 +38,12 @@ export const getAllCustomerRepo = async (query: ICustomerQuery): Promise<ICustom
         customers
     };
 };
+
+export const getSingleCustomerRepo = (customerId: string) => {
+
+    const customer = Customer.findById(customerId);
+    if (!customer) {
+        throw new Error("Customer not found");
+    }
+    return customer;
+}
