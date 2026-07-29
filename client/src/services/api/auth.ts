@@ -51,3 +51,8 @@ export const getParticularCustomerByIDApi = async (customerId: string) => {
     const response = await api.get(`/api/customer/${customerId}`);
     return response.data;
 }
+
+export const deleterCustomerByIdApi = async (customerId: string) => {
+    const response = await api.get(`/api/customer/delete/${customerId}`);
+    return response.data;
+}

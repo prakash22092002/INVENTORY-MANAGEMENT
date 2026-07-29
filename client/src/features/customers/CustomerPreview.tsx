@@ -17,12 +17,13 @@ import {
     Check,
     ShieldCheck,
     Globe,
-    AlertCircle
+    AlertCircle,
+    Trash2
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { Customer } from '@/types/customer'
-import { getParticularCustomerByIDApi } from '@/services/api/auth'
+import { getParticularCustomerByIDApi, deleterCustomerByIdApi } from '@/services/api/auth'
 
 const CustomerPreview = () => {
     const { id } = useParams<{ id: string }>()
@@ -32,6 +33,25 @@ const CustomerPreview = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
     const [copiedField, setCopiedField] = useState<string | null>(null)
+    const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+
+    const handleDeleteCustomer = async () => {
+        if (!id) return
+        try {
+            setDeleteLoading(true)
+            const response = await deleterCustomerByIdApi(id)
+            if (response?.es === 0 || response?.status === 200 || response?.message) {
+                toast.success(response?.message || 'Customer deleted successfully')
+                navigate(-1)
+            } else {
+                toast.error(response?.data?.message || response?.message || 'Failed to delete customer')
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || error?.message || 'An error occurred while deleting customer')
+        } finally {
+            setDeleteLoading(false)
+        }
+    }
 
     const handleCopy = (text: string, fieldName: string) => {
         if (!text) return
@@ -175,12 +195,24 @@ const CustomerPreview = () => {
                             Call Customer
                         </a>
                     )}
+                    <button
+                        onClick={handleDeleteCustomer}
+                        disabled={deleteLoading}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 shadow-sm transition-all hover:bg-rose-100 hover:text-rose-700 disabled:opacity-50 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-400 dark:hover:bg-rose-900/50"
+                    >
+                        {deleteLoading ? (
+                            <Loader2 className="size-3.5 animate-spin text-rose-600 dark:text-rose-400" />
+                        ) : (
+                            <Trash2 className="size-3.5 text-rose-600 dark:text-rose-400" />
+                        )}
+                        Delete Customer
+                    </button>
                 </div>
             </div>
 
             {/* Hero Banner Card */}
             <div className="customer-preview-hero relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="customer-preview-headder flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-start gap-4 sm:items-center">
                         <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-700 text-lg font-bold text-white shadow-md dark:from-zinc-100 dark:to-zinc-300 dark:text-zinc-900">
                             {getInitials(customer.customerName)}

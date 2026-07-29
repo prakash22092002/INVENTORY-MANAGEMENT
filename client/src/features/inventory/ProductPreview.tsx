@@ -189,14 +189,37 @@ const ProductPreview = () => {
 
     return (
         <div className="product-preview flex flex-col gap-6">
-            <div className="product-preview-back">
+            {/* Top Bar Navigation */}
+            <div className="product-preview-back flex flex-wrap items-center justify-between gap-4">
                 <button
                     onClick={() => navigate('/inventory')}
-                    className="product-preview-back-btn inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-zinc-900 dark:hover:text-zinc-200"
+                    className="product-preview-back-btn inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-zinc-900 dark:hover:text-zinc-200"
                 >
                     <ArrowLeft className="product-preview-back-icon size-4" />
                     Back to Inventory
                 </button>
+
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setEditOpen(true)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition-all hover:bg-zinc-50 dark:border-zinc-700/60 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                    >
+                        <Edit className="size-3.5 text-zinc-500" />
+                        Edit Product
+                    </button>
+                    <button
+                        onClick={handleDeleteProduct}
+                        disabled={deleteLoading}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-600 shadow-sm transition-all hover:bg-rose-100 hover:text-rose-700 disabled:opacity-50 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-400 dark:hover:bg-rose-900/50"
+                    >
+                        {deleteLoading ? (
+                            <Loader2 className="size-3.5 animate-spin text-rose-600 dark:text-rose-400" />
+                        ) : (
+                            <Trash2 className="size-3.5 text-rose-600 dark:text-rose-400" />
+                        )}
+                        Delete Product
+                    </button>
+                </div>
             </div>
 
             {/* Hero Banner */}
@@ -216,27 +239,6 @@ const ProductPreview = () => {
                             {productPreviewData.description || 'No description provided.'}
                         </p>
                     </div>
-                </div>
-                <div className="flex items-center gap-2 self-start">
-                    <button
-                        onClick={() => setEditOpen(true)}
-                        className="product-preview-edit-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm"
-                    >
-                        <Edit className="product-preview-edit-icon size-4" />
-                        Edit Product
-                    </button>
-                    <button
-                        onClick={handleDeleteProduct}
-                        disabled={deleteLoading}
-                        className="product-preview-delete-btn inline-flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-50 shadow-sm"
-                    >
-                        {deleteLoading ? (
-                            <Loader2 className="size-4 animate-spin" />
-                        ) : (
-                            <Trash2 className="size-4" />
-                        )}
-
-                    </button>
                 </div>
             </div>
 
