@@ -3,6 +3,7 @@ import addCustomerService from "../../services/customerService/addCustomerServic
 import getAllCustomerService from "../../services/customerService/getAllCustomerService";
 import { sendErrorResponse, sendSuccessResponse } from "../../utils/responseHelper";
 import { getSingleCustomerService } from "../../services/customerService/getSingleCustomerService";
+import { deleteCustomerByIdService } from "../../services/customerService/deleteCustomerByAiService";
 
 export const addCustomerController = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -40,3 +41,25 @@ export const getSingleCustomerController = async (req: Request, res: Response, n
         sendErrorResponse(res, 400, message);
     }
 };
+
+
+export const deleteCustomerByAiController = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { customerId } = req.params;
+
+        if (!customerId || typeof customerId !== "string") {
+            sendErrorResponse(res, 400, "Customer ID is required");
+            return;
+        }
+
+        const customer = await deleteCustomerByIdService(customerId);
+
+        return sendSuccessResponse(res, 200, "Customer deleted successfully", { customer });
+
+
+
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Internal Server Error";
+        sendErrorResponse(res, 400, message);
+    }
+}

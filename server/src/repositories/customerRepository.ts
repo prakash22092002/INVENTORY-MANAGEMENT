@@ -47,3 +47,12 @@ export const getSingleCustomerRepo = (customerId: string) => {
     }
     return customer;
 }
+
+export const deleteCustomerByIdRepo = (customerId: string) => {
+    const customer = Customer.findByIdAndDelete(customerId);
+
+    if (!customer) {
+        throw new Error("Customer not found");
+    }
+    return customer;
+}
