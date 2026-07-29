@@ -1,124 +1,415 @@
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Users, ArrowLeft, Mail, Phone, MapPin, Building, FileText } from 'lucide-react'
-import { useState } from 'react'
+import {
+    Users,
+    ArrowLeft,
+    Mail,
+    Phone,
+    MapPin,
+    Building,
+    FileText,
+    Calendar,
+    Clock,
+    Loader2,
+    Hash,
+    Copy,
+    Check,
+    ShieldCheck,
+    Globe,
+    AlertCircle
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import type { Customer } from '@/types/customer'
+import { getParticularCustomerByIDApi } from '@/services/api/auth'
 
 const CustomerPreview = () => {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
 
-    const [customer] = useState<Customer | null>(null)
+    const [customer, setCustomer] = useState<Customer | null>(null)
+    const [loading, setLoading] = useState<boolean>(true)
+    const [error, setError] = useState<string | null>(null)
+    const [copiedField, setCopiedField] = useState<string | null>(null)
 
-    if (!customer) {
+    const handleCopy = (text: string, fieldName: string) => {
+        if (!text) return
+        navigator.clipboard.writeText(text)
+        setCopiedField(fieldName)
+        toast.success(`${fieldName} copied to clipboard!`)
+        setTimeout(() => setCopiedField(null), 2000)
+    }
+
+    const formatDate = (dateStr?: string) => {
+        if (!dateStr) return 'N/A'
+        try {
+            return new Date(dateStr).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            })
+        } catch {
+            return dateStr
+        }
+    }
+
+    const getInitials = (name?: string) => {
+        if (!name) return 'CU'
+        const parts = name.trim().split(' ')
+        if (parts.length >= 2) {
+            return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+        }
+        return name.slice(0, 2).toUpperCase()
+    }
+
+    useEffect(() => {
+        const fetchCustomerData = async () => {
+            if (!id) {
+                setError('No Customer ID provided')
+                setLoading(false)
+                return
+            }
+
+            try {
+                setLoading(true)
+                setError(null)
+                const res = await getParticularCustomerByIDApi(id)
+
+                if (res?.es === 0 && res?.data?.customer) {
+                    setCustomer(res.data.customer)
+                } else if (res?.data?.customer) {
+                    setCustomer(res.data.customer)
+                } else if (res?.customerName) {
+                    setCustomer(res)
+                } else {
+                    setError(res?.data?.message || 'Customer not found')
+                }
+            } catch (err: any) {
+                console.error('Error fetching customer:', err)
+                setError(err?.response?.data?.data?.message || err?.message || 'Failed to load customer details')
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchCustomerData()
+    }, [id])
+
+    if (loading) {
         return (
-            <div className="customer-preview-not-found flex flex-col items-center justify-center gap-4 py-24">
-                <Users className="customer-preview-not-found-icon size-12 text-zinc-300" />
-                <h2 className="customer-preview-not-found-title text-lg font-semibold">Customer not found</h2>
-                <p className="customer-preview-not-found-desc text-sm text-muted-foreground">
-                    The customer preview for ID "{id || 'N/A'}" could not be found.
-                </p>
-                <Link
-                    to="/customers"
-                    className="customer-preview-not-found-link inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-                >
-                    <ArrowLeft className="size-4" />
-                    Back to Customers
-                </Link>
+            <div className="customer-preview-loading flex flex-col items-center justify-center gap-4 py-32">
+                <Loader2 className="size-8 animate-spin text-zinc-500" />
+                <p className="text-sm font-medium text-muted-foreground">Loading customer details...</p>
             </div>
         )
     }
 
-    const detailItems = [
-        { label: 'Customer Name', value: customer.customerName || 'N/A', icon: Users },
-        { label: 'Email', value: customer.email || 'N/A', icon: Mail },
-        { label: 'Mobile Number', value: customer.mobileNumber || 'N/A', icon: Phone },
-        { label: 'Company Name', value: customer.companyName || 'N/A', icon: Building },
-        { label: 'PAN Card Number', value: customer.pan || 'N/A', icon: FileText },
-        { label: 'Pin Code', value: customer.pinCode || 'N/A', icon: MapPin },
-    ]
+    if (error || !customer) {
+        return (
+            <div className="customer-preview flex flex-col gap-6">
+                <div className="customer-preview-back">
+                    <button
+                        onClick={() => navigate('/customers')}
+                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-zinc-900 dark:hover:text-zinc-200"
+                    >
+                        <ArrowLeft className="size-4" />
+                        Back to Customers
+                    </button>
+                </div>
+
+                <div className="customer-preview-not-found flex flex-col items-center justify-center gap-4 rounded-2xl border border-zinc-200/50 bg-white/60 py-20 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                    <div className="flex size-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500 dark:bg-rose-500/20">
+                        <AlertCircle className="size-7" />
+                    </div>
+                    <div className="text-center">
+                        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                            {error || 'Customer not found'}
+                        </h2>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            The requested customer record could not be retrieved.
+                        </p>
+                    </div>
+                    <Link
+                        to="/customers"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                    >
+                        <ArrowLeft className="size-4" />
+                        Return to Customer List
+                    </Link>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="customer-preview flex flex-col gap-6">
-            <div className="customer-preview-back">
+            {/* Top Bar Navigation */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
                 <button
                     onClick={() => navigate('/customers')}
-                    className="customer-preview-back-btn inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-zinc-900 dark:hover:text-zinc-200"
+                    className="customer-preview-back-btn inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-zinc-900 dark:hover:text-zinc-200"
                 >
-                    <ArrowLeft className="customer-preview-back-icon size-4" />
+                    <ArrowLeft className="size-4" />
                     Back to Customers
                 </button>
+
+                <div className="flex items-center gap-2">
+                    {customer.email && (
+                        <a
+                            href={`mailto:${customer.email}`}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition-all hover:bg-zinc-50 dark:border-zinc-700/60 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        >
+                            <Mail className="size-3.5 text-zinc-500" />
+                            Send Email
+                        </a>
+                    )}
+                    {customer.mobileNumber && (
+                        <a
+                            href={`tel:${customer.mobileNumber}`}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition-all hover:bg-zinc-50 dark:border-zinc-700/60 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        >
+                            <Phone className="size-3.5 text-zinc-500" />
+                            Call Customer
+                        </a>
+                    )}
+                </div>
             </div>
 
-            <div className="customer-preview-hero flex flex-col gap-4 rounded-2xl border border-zinc-200/50 bg-white/60 p-5 shadow-sm shadow-zinc-900/5 backdrop-blur-xl sm:flex-row sm:items-start sm:justify-between dark:border-zinc-700/40 dark:bg-zinc-900/50">
-                <div className="customer-preview-hero-info flex items-start gap-4">
-                    <div className="customer-preview-hero-icon-wrapper flex size-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
-                        <Users className="customer-preview-hero-icon size-7 text-zinc-500" />
-                    </div>
-                    <div className="customer-preview-hero-text flex flex-col gap-1.5">
-                        <div className="customer-preview-hero-title-row flex items-center gap-2.5">
-                            <h1 className="customer-preview-hero-name text-xl font-semibold tracking-tight sm:text-2xl">
-                                {customer.customerName}
-                            </h1>
-                            <Badge
-                                variant="default"
-                                className="customer-preview-hero-badge rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                            >
-                                Active
-                            </Badge>
+            {/* Hero Banner Card */}
+            <div className="customer-preview-hero relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/60 p-6 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-start gap-4 sm:items-center">
+                        <div className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-700 text-lg font-bold text-white shadow-md dark:from-zinc-100 dark:to-zinc-300 dark:text-zinc-900">
+                            {getInitials(customer.customerName)}
                         </div>
-                        <p className="customer-preview-hero-desc text-sm text-muted-foreground">
-                            {customer.companyName} &middot; {customer.city}, {customer.country}
-                        </p>
+                        <div className="flex flex-col gap-1">
+                            <div className="flex flex-wrap items-center gap-2.5">
+                                <h1 className="text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl dark:text-zinc-100">
+                                    {customer.customerName}
+                                </h1>
+                                <Badge className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 border border-emerald-500/30 dark:text-emerald-400">
+                                    <ShieldCheck className="mr-1 size-3 inline" />
+                                    Active Customer
+                                </Badge>
+                            </div>
+                            <p className="text-sm font-medium text-muted-foreground flex flex-wrap items-center gap-2">
+                                {customer.companyName && (
+                                    <span className="flex items-center gap-1">
+                                        <Building className="size-3.5 text-zinc-400" />
+                                        {customer.companyName}
+                                    </span>
+                                )}
+                                {customer.companyName && (customer.city || customer.country) && <span>&middot;</span>}
+                                {(customer.city || customer.country) && (
+                                    <span className="flex items-center gap-1">
+                                        <Globe className="size-3.5 text-zinc-400" />
+                                        {[customer.city, customer.state, customer.country].filter(Boolean).join(', ')}
+                                    </span>
+                                )}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="customer-preview-grid grid grid-cols-1 gap-3 lg:grid-cols-2">
-                <Card className="customer-preview-details border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
-                    <CardHeader className="customer-preview-details-header">
-                        <CardTitle className="customer-preview-details-title text-sm font-semibold">
-                            Customer Details
+            {/* Content Cards Grid */}
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                {/* Personal & Contact Info Card */}
+                <Card className="border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                    <CardHeader className="border-b border-zinc-100 pb-4 dark:border-zinc-800">
+                        <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                            <Users className="size-4 text-zinc-500" />
+                            Contact Information
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="customer-preview-details-body">
-                        <div className="customer-preview-detail-grid grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
-                            {detailItems.map((item) => {
-                                const Icon = item.icon
-                                return (
-                                    <div
-                                        key={item.label}
-                                        className="customer-preview-detail-item flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40"
-                                    >
-                                        <Icon className="customer-preview-detail-item-icon size-4 text-zinc-400" />
-                                        <div className="customer-preview-detail-item-text flex flex-col">
-                                            <span className="customer-preview-detail-item-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                                                {item.label}
-                                            </span>
-                                            <span className="customer-preview-detail-item-value text-sm font-medium">{item.value}</span>
-                                        </div>
-                                    </div>
-                                )
-                            })}
+                    <CardContent className="pt-4 flex flex-col gap-3">
+                        <div className="group flex items-center justify-between rounded-lg p-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40">
+                            <div className="flex items-center gap-3">
+                                <div className="flex size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                                    <Users className="size-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Full Name</span>
+                                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{customer.customerName || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="group flex items-center justify-between rounded-lg p-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40">
+                            <div className="flex items-center gap-3">
+                                <div className="flex size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                                    <Mail className="size-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Email Address</span>
+                                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{customer.email || 'N/A'}</span>
+                                </div>
+                            </div>
+                            {customer.email && (
+                                <button
+                                    onClick={() => handleCopy(customer.email, 'Email')}
+                                    className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                    title="Copy Email"
+                                >
+                                    {copiedField === 'Email' ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="group flex items-center justify-between rounded-lg p-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40">
+                            <div className="flex items-center gap-3">
+                                <div className="flex size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                                    <Phone className="size-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Mobile Number</span>
+                                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{customer.mobileNumber || 'N/A'}</span>
+                                </div>
+                            </div>
+                            {customer.mobileNumber && (
+                                <button
+                                    onClick={() => handleCopy(customer.mobileNumber, 'Mobile Number')}
+                                    className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                    title="Copy Mobile Number"
+                                >
+                                    {copiedField === 'Mobile Number' ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="group flex items-center justify-between rounded-lg p-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40">
+                            <div className="flex items-center gap-3">
+                                <div className="flex size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                                    <Building className="size-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Company Name</span>
+                                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{customer.companyName || 'N/A'}</span>
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="customer-preview-address border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
-                    <CardHeader className="customer-preview-address-header">
-                        <CardTitle className="customer-preview-address-title text-sm font-semibold">
-                            Address
+                {/* Address Information Card */}
+                <Card className="border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                    <CardHeader className="border-b border-zinc-100 pb-4 dark:border-zinc-800">
+                        <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                            <MapPin className="size-4 text-zinc-500" />
+                            Address & Location
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="customer-preview-address-body">
-                        <div className="customer-preview-address-detail flex items-start gap-3 rounded-lg px-3 py-2.5">
-                            <MapPin className="customer-preview-address-icon size-4 text-zinc-400 mt-0.5" />
-                            <div className="customer-preview-address-text flex flex-col gap-0.5">
-                                <span className="customer-preview-address-line text-sm">{customer.address}</span>
-                                <span className="customer-preview-address-city text-sm text-muted-foreground">
-                                    {customer.city}, {customer.state}, {customer.country} - {customer.pinCode}
+                    <CardContent className="pt-4 flex flex-col gap-3">
+                        <div className="flex items-start gap-3 rounded-lg p-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 mt-0.5">
+                                <MapPin className="size-4" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Street Address</span>
+                                <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{customer.address || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1 rounded-lg bg-zinc-50/70 p-3 dark:bg-zinc-800/30">
+                                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">City</span>
+                                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{customer.city || 'N/A'}</span>
+                            </div>
+                            <div className="flex flex-col gap-1 rounded-lg bg-zinc-50/70 p-3 dark:bg-zinc-800/30">
+                                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">State</span>
+                                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{customer.state || 'N/A'}</span>
+                            </div>
+                            <div className="flex flex-col gap-1 rounded-lg bg-zinc-50/70 p-3 dark:bg-zinc-800/30">
+                                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Country</span>
+                                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{customer.country || 'N/A'}</span>
+                            </div>
+                            <div className="flex flex-col gap-1 rounded-lg bg-zinc-50/70 p-3 dark:bg-zinc-800/30">
+                                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Pin / Postal Code</span>
+                                <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{customer.pinCode || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Identification & Financial Information */}
+                <Card className="border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                    <CardHeader className="border-b border-zinc-100 pb-4 dark:border-zinc-800">
+                        <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                            <FileText className="size-4 text-zinc-500" />
+                            Tax & Tax Identification
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 flex flex-col gap-3">
+                        <div className="group flex items-center justify-between rounded-lg p-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40">
+                            <div className="flex items-center gap-3">
+                                <div className="flex size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                                    <FileText className="size-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">PAN Number</span>
+                                    <span className="font-mono text-sm font-semibold text-zinc-900 dark:text-zinc-100">{customer.pan || 'N/A'}</span>
+                                </div>
+                            </div>
+                            {customer.pan && (
+                                <button
+                                    onClick={() => handleCopy(customer.pan, 'PAN Number')}
+                                    className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                    title="Copy PAN Number"
+                                >
+                                    {copiedField === 'PAN Number' ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
+                                </button>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* System & Metadata Card */}
+                <Card className="border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                    <CardHeader className="border-b border-zinc-100 pb-4 dark:border-zinc-800">
+                        <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                            <Clock className="size-4 text-zinc-500" />
+                            System Audit & Metadata
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 flex flex-col gap-3">
+                        {customer._id && (
+                            <div className="group flex items-center justify-between rounded-lg p-2.5 transition-colors hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex size-9 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                                        <Hash className="size-4" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Customer ID</span>
+                                        <span className="font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300">{customer._id}</span>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => handleCopy(customer._id!, 'Customer ID')}
+                                    className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                    title="Copy Customer ID"
+                                >
+                                    {copiedField === 'Customer ID' ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-col gap-1 rounded-lg bg-zinc-50/70 p-3 dark:bg-zinc-800/30">
+                                <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                                    <Calendar className="size-3 text-zinc-400" />
+                                    Created At
                                 </span>
+                                <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100">{formatDate(customer.createdAt)}</span>
+                            </div>
+                            <div className="flex flex-col gap-1 rounded-lg bg-zinc-50/70 p-3 dark:bg-zinc-800/30">
+                                <span className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                                    <Clock className="size-3 text-zinc-400" />
+                                    Updated At
+                                </span>
+                                <span className="text-xs font-medium text-zinc-900 dark:text-zinc-100">{formatDate(customer.updatedAt)}</span>
                             </div>
                         </div>
                     </CardContent>
@@ -129,3 +420,4 @@ const CustomerPreview = () => {
 }
 
 export default CustomerPreview
+

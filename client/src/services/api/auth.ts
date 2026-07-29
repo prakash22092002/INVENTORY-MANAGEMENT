@@ -46,3 +46,8 @@ export const getAllCustomerApi = async (payload: { page: number; pageSize?: numb
     const response = await api.post(`/api/customer`, payload);
     return response.data;
 }
+
+export const getParticularCustomerByIDApi = async (customerId: string) => {
+    const response = await api.get(`/api/customer/${customerId}`);
+    return response.data;
+}
