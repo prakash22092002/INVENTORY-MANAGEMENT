@@ -56,3 +56,8 @@ export const deleterCustomerByIdApi = async (customerId: string) => {
     const response = await api.get(`/api/customer/delete/${customerId}`);
     return response.data;
 }
+
+export const updateCustomerApi = async (payload: Partial<Customer>) => {
+    const response = await api.post(`/api/customer/edit`, payload);
+    return response.data;
+}

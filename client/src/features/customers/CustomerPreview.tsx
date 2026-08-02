@@ -18,12 +18,14 @@ import {
     ShieldCheck,
     Globe,
     AlertCircle,
-    Trash2
+    Trash2,
+    Pencil
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { Customer } from '@/types/customer'
-import { getParticularCustomerByIDApi, deleterCustomerByIdApi } from '@/services/api/auth'
+import { getParticularCustomerByIDApi, deleterCustomerByIdApi, updateCustomerApi } from '@/services/api/auth'
+import CustomerFormModal, { type CustomerFormData } from './CustomerFormModal'
 
 const CustomerPreview = () => {
     const { id } = useParams<{ id: string }>()
@@ -34,6 +36,43 @@ const CustomerPreview = () => {
     const [error, setError] = useState<string | null>(null)
     const [copiedField, setCopiedField] = useState<string | null>(null)
     const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+    const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
+    const [updateLoading, setUpdateLoading] = useState<boolean>(false)
+
+    const handleUpdateCustomer = async (formData: CustomerFormData) => {
+        if (!id || !customer) return
+        try {
+            setUpdateLoading(true)
+            const payload: Customer = {
+                // ...customer,
+                customerId: id,
+                customerName: formData.customerName,
+                email: formData.email,
+                mobileNumber: formData.mobileNumber,
+                companyName: formData.companyName || '',
+                address: formData.address,
+                city: formData.city,
+                state: formData.state,
+                country: formData.country,
+                pinCode: formData.pincode,
+                pan: formData.pan,
+            }
+
+            const response = await updateCustomerApi(payload)
+            if (response?.es === 0 || response?.status === 200 || response?.data?.customer || response?.customer) {
+                const updated = response?.data?.customer || response?.customer || payload
+                setCustomer(updated)
+                toast.success(response?.message || 'Customer updated successfully')
+                setEditModalOpen(false)
+            } else {
+                toast.error(response?.data?.message || response?.message || 'Failed to update customer')
+            }
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || error?.message || 'An error occurred while updating customer')
+        } finally {
+            setUpdateLoading(false)
+        }
+    }
 
     const handleDeleteCustomer = async () => {
         if (!id) return
@@ -195,6 +234,13 @@ const CustomerPreview = () => {
                             Call Customer
                         </a>
                     )}
+                    <button
+                        onClick={() => setEditModalOpen(true)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition-all hover:bg-zinc-50 dark:border-zinc-700/60 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                    >
+                        <Pencil className="size-3.5 text-zinc-500" />
+                        Edit Customer
+                    </button>
                     <button
                         onClick={handleDeleteCustomer}
                         disabled={deleteLoading}
@@ -447,6 +493,14 @@ const CustomerPreview = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            <CustomerFormModal
+                open={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                onSubmit={handleUpdateCustomer}
+                customer={customer}
+                loading={updateLoading}
+            />
         </div>
     )
 }
