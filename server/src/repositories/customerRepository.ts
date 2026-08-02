@@ -56,3 +56,12 @@ export const deleteCustomerByIdRepo = (customerId: string) => {
     }
     return customer;
 }
+
+export const updateCustomerByIdRepo = async (customerId: string, data: Partial<ICustomer>) => {
+    const customer = await Customer.findByIdAndUpdate(customerId, data, { new: true });
+
+    if (!customer) {
+        throw new Error("Customer not found");
+    }
+    return customer;
+}

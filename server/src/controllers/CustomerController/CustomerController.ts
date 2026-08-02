@@ -4,6 +4,7 @@ import getAllCustomerService from "../../services/customerService/getAllCustomer
 import { sendErrorResponse, sendSuccessResponse } from "../../utils/responseHelper";
 import { getSingleCustomerService } from "../../services/customerService/getSingleCustomerService";
 import { deleteCustomerByIdService } from "../../services/customerService/deleteCustomerByAiService";
+import updateCustomerService from "../../services/customerService/updateCustomerService";
 
 export const addCustomerController = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -58,6 +59,24 @@ export const deleteCustomerByAiController = async (req: Request, res: Response, 
 
 
 
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Internal Server Error";
+        sendErrorResponse(res, 400, message);
+    }
+}
+
+export const updateCustomerController = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const customerData = req.body;
+        const idToUpdate = customerData?.customerId;
+
+        if (!idToUpdate || typeof idToUpdate !== "string") {
+            sendErrorResponse(res, 400, "Customer ID is required");
+            return;
+        }
+
+        const customer = await updateCustomerService(idToUpdate, customerData);
+        return sendSuccessResponse(res, 200, "Customer updated successfully", { customer });
     } catch (error) {
         const message = error instanceof Error ? error.message : "Internal Server Error";
         sendErrorResponse(res, 400, message);
