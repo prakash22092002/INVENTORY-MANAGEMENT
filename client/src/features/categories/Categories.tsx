@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -10,15 +10,34 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { FolderTree, Plus, Pencil } from 'lucide-react'
+import {
+    FolderTree,
+    Plus,
+    Pencil,
+    Loader2,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+} from 'lucide-react'
 import type { Category } from '@/types/category'
-import { mockCategories } from '@/data/categories'
 import CategoryFormModal from './CategoryFormModal'
+import SearchBar from '@/components/common/SearchBar'
+import { getAllCategoriesApi } from '@/services/api/auth'
 
 const Categories = () => {
     const navigate = useNavigate()
     const [modalOpen, setModalOpen] = useState(false)
     const [editingCategory, setEditingCategory] = useState<Category | undefined>(undefined)
+    const [categories, setCategories] = useState<Category[]>([])
+    const [loading, setLoading] = useState(false)
+
+    // Pagination & search states
+    const [currentPage, setCurrentPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
+    const [totalCategories, setTotalCategories] = useState(0)
+    const [totalPages, setTotalPages] = useState(1)
+    const [searchQuery, setSearchQuery] = useState('')
 
     const handleEdit = (category: Category) => {
         setEditingCategory(category)
@@ -30,9 +49,60 @@ const Categories = () => {
         setEditingCategory(undefined)
     }
 
+    const fetchCategories = async (
+        page: number = currentPage,
+        size: number = pageSize,
+        search: string = searchQuery
+    ) => {
+        setLoading(true)
+        try {
+            const response = await getAllCategoriesApi({
+                page: page - 1, // backend 0-indexed page
+                pageSize: size,
+                search: search,
+            })
+
+            const categoryData = response?.data?.category
+            if (categoryData) {
+                const list = categoryData.category || []
+                const totalDoc = categoryData.totalDocuments ?? list.length
+                const pages = categoryData.totalPages || Math.ceil(totalDoc / size) || 1
+
+                setCategories(list)
+                setTotalCategories(totalDoc)
+                setTotalPages(pages)
+            } else if (Array.isArray(response?.data)) {
+                setCategories(response.data)
+                setTotalCategories(response.data.length)
+                setTotalPages(Math.ceil(response.data.length / size) || 1)
+            } else {
+                setCategories([])
+                setTotalCategories(0)
+                setTotalPages(1)
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error)
+            setCategories([])
+            setTotalCategories(0)
+            setTotalPages(1)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchCategories(currentPage, pageSize, searchQuery)
+        }, 300)
+
+        return () => clearTimeout(timer)
+    }, [currentPage, pageSize, searchQuery])
+
+    const startIndex = (currentPage - 1) * pageSize
+
     return (
         <div className="categories flex flex-col gap-6">
-            <div className="categories-header flex items-center justify-between">
+            <div className="categories-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="categories-header-info flex flex-col gap-1">
                     <h1 className="categories-header-title text-2xl font-semibold tracking-tight sm:text-3xl">
                         Categories
@@ -41,16 +111,33 @@ const Categories = () => {
                         Organize your products into categories.
                     </p>
                 </div>
-                <button
-                    onClick={() => {
-                        setEditingCategory(undefined)
-                        setModalOpen(true)
-                    }}
-                    className="categories-create-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
-                >
-                    <Plus className="categories-create-btn-icon size-4" />
-                    Create Category
-                </button>
+
+                <div className="flex items-center gap-3 self-end sm:self-auto">
+                    <SearchBar
+                        value={searchQuery}
+                        onChange={(val) => {
+                            setSearchQuery(val)
+                            setCurrentPage(1)
+                        }}
+                        onClear={() => {
+                            setSearchQuery('')
+                            setCurrentPage(1)
+                        }}
+                        placeholder="Search categories..."
+                        loading={loading}
+                    />
+
+                    <button
+                        onClick={() => {
+                            setEditingCategory(undefined)
+                            setModalOpen(true)
+                        }}
+                        className="categories-create-btn inline-flex items-center gap-1.5 rounded-xl bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
+                    >
+                        <Plus className="categories-create-btn-icon size-4" />
+                        Create Category
+                    </button>
+                </div>
             </div>
 
             <Card className="categories-table-card border-zinc-200/50 bg-white/60 shadow-sm shadow-zinc-900/5 backdrop-blur-xl dark:border-zinc-700/40 dark:bg-zinc-900/50">
@@ -59,7 +146,7 @@ const Categories = () => {
                         All Categories
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="categories-table-card-body">
+                <CardContent className="categories-table-card-body p-0 sm:p-6">
                     <Table className="categories-table">
                         <TableHeader className="categories-table-header">
                             <TableRow className="border-zinc-200/50 dark:border-zinc-700/40">
@@ -71,58 +158,155 @@ const Categories = () => {
                             </TableRow>
                         </TableHeader>
                         <TableBody className="categories-table-body">
-                            {mockCategories.map((category) => (
-                                <TableRow
-                                    key={category.id}
-                                    onClick={() => navigate(`/inventory?category=${category.slug}`)}
-                                    className="categories-table-row cursor-pointer border-zinc-200/50 transition-colors hover:bg-zinc-100/50 dark:border-zinc-700/40 dark:hover:bg-zinc-800/40"
-                                >
-                                    <TableCell className="categories-table-cell categories-table-cell--name py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex size-8 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                                                <FolderTree className="size-4 text-zinc-500" />
-                                            </div>
-                                            <span className="text-sm font-medium">{category.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="categories-table-cell categories-table-cell--slug py-3 text-sm text-muted-foreground">
-                                        {category.slug}
-                                    </TableCell>
-                                    <TableCell className="categories-table-cell categories-table-cell--description py-3 text-sm text-muted-foreground max-w-xs truncate">
-                                        {category.description}
-                                    </TableCell>
-                                    <TableCell className="categories-table-cell categories-table-cell--products py-3 text-right text-sm">
-                                        {category.productCount}
-                                    </TableCell>
-                                    <TableCell className="categories-table-cell categories-table-cell--status py-3 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <Badge
-                                                variant={category.status === 'Active' ? 'default' : 'secondary'}
-                                                className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                                            >
-                                                {category.status}
-                                            </Badge>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleEdit(category)
-                                                }}
-                                                className="flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-                                            >
-                                                <Pencil className="size-3.5" />
-                                            </button>
+                            {loading ? (
+                                <TableRow className="categories-table-loading-row">
+                                    <TableCell colSpan={5} className="py-12 text-center text-sm text-muted-foreground">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Loader2 className="size-5 animate-spin text-zinc-500" />
+                                            <span>Loading categories...</span>
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : categories.length === 0 ? (
+                                <TableRow className="categories-table-empty-row">
+                                    <TableCell colSpan={5} className="py-12 text-center text-sm text-muted-foreground">
+                                        {searchQuery ? `No categories matching "${searchQuery}"` : 'No categories found.'}
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                categories.map((category, index) => {
+                                    const name = category.categoryName || category.name || 'Unnamed Category'
+                                    const key = category._id || category.id || index
+                                    const status = category.status || 'Active'
+                                    const productCount = category.productCount ?? 0
+
+                                    return (
+                                        <TableRow
+                                            key={key}
+                                            onClick={() => navigate(`/inventory?category=${category.slug}`)}
+                                            className="categories-table-row cursor-pointer border-zinc-200/50 transition-colors hover:bg-zinc-100/50 dark:border-zinc-700/40 dark:hover:bg-zinc-800/40"
+                                        >
+                                            <TableCell className="categories-table-cell categories-table-cell--name py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex size-8 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                                                        <FolderTree className="size-4 text-zinc-500" />
+                                                    </div>
+                                                    <span className="text-sm font-medium">{name}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="categories-table-cell categories-table-cell--slug py-3 text-sm text-muted-foreground">
+                                                {category.slug}
+                                            </TableCell>
+                                            <TableCell className="categories-table-cell categories-table-cell--description py-3 text-sm text-muted-foreground max-w-xs truncate">
+                                                {category.description || '-'}
+                                            </TableCell>
+                                            <TableCell className="categories-table-cell categories-table-cell--products py-3 text-right text-sm">
+                                                {productCount}
+                                            </TableCell>
+                                            <TableCell className="categories-table-cell categories-table-cell--status py-3 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Badge
+                                                        variant={status === 'Active' ? 'default' : 'secondary'}
+                                                        className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+                                                    >
+                                                        {status}
+                                                    </Badge>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleEdit(category)
+                                                        }}
+                                                        className="flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                                                    >
+                                                        <Pencil className="size-3.5" />
+                                                    </button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })
+                            )}
                         </TableBody>
                     </Table>
+
+                    {/* Pagination Controls Footer */}
+                    {totalCategories > 0 && (
+                        <div className="flex flex-col gap-3 px-6 py-4 border-t border-zinc-200/50 dark:border-zinc-700/40 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex flex-wrap items-center gap-4">
+                                <span className="text-xs text-muted-foreground">
+                                    Showing <span className="font-semibold text-zinc-900 dark:text-zinc-100">{totalCategories > 0 ? startIndex + 1 : 0}</span> to{' '}
+                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{Math.min(startIndex + categories.length, totalCategories)}</span> of{' '}
+                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">{totalCategories}</span> entries
+                                </span>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">Rows per page:</span>
+                                    <select
+                                        value={pageSize}
+                                        onChange={(e) => {
+                                            setPageSize(Number(e.target.value))
+                                            setCurrentPage(1)
+                                        }}
+                                        className="h-8 rounded-lg border border-zinc-200/80 bg-white/80 px-2 text-xs font-medium text-zinc-900 outline-none hover:border-zinc-300 dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-600"
+                                    >
+                                        <option value={5}>5</option>
+                                        <option value={10}>10</option>
+                                        <option value={20}>20</option>
+                                        <option value={50}>50</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                                <button
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1 || loading}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="First Page"
+                                >
+                                    <ChevronsLeft className="size-4" />
+                                </button>
+
+                                <button
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1 || loading}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="Previous Page"
+                                >
+                                    <ChevronLeft className="size-4" />
+                                </button>
+
+                                <span className="px-3 text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+
+                                <button
+                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages || loading}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="Next Page"
+                                >
+                                    <ChevronRight className="size-4" />
+                                </button>
+
+                                <button
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages || loading}
+                                    className="flex size-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white/80 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-40 disabled:hover:bg-white dark:border-zinc-700/70 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:disabled:hover:bg-zinc-800"
+                                    title="Last Page"
+                                >
+                                    <ChevronsRight className="size-4" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
             <CategoryFormModal
                 open={modalOpen}
                 onClose={handleClose}
+                onSuccess={() => fetchCategories(currentPage, pageSize, searchQuery)}
                 category={editingCategory}
             />
         </div>

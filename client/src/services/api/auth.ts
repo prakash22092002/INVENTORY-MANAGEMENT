@@ -1,6 +1,7 @@
 import type { Customer } from '@/types/customer'
 import api from './axios'
 import type { SignUpPayload, LoginPayload, GetAllPaymentPayload, CreateProductPayload, EditProductPayload } from '@/types/auth'
+import type { CreateCategoryPayload, getCategoryPayload } from '@/types/category'
 
 export const signUpApi = async (payload: SignUpPayload) => {
     const response = await api.post('/api/users/signup', payload)
@@ -61,3 +62,14 @@ export const updateCustomerApi = async (payload: Partial<Customer>) => {
     const response = await api.post(`/api/customer/edit`, payload);
     return response.data;
 }
+
+export const getAllCategoriesApi = async (payload: getCategoryPayload) => {
+    const response = await api.post(`/api/category`, payload);
+    return response.data;
+}
+
+export const createCategoryApi = async (payload: CreateCategoryPayload) => {
+    const response = await api.post(`/api/category/add`, payload);
+    return response.data;
+}
+

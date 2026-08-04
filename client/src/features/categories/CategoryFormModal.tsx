@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Category } from '@/types/category'
+import { createCategoryApi } from '@/services/api/auth'
+import { toast } from 'sonner'
 
 type CategoryFormData = {
     name: string
@@ -13,6 +15,7 @@ type CategoryFormData = {
 type CategoryFormModalProps = {
     open: boolean
     onClose: () => void
+    onSuccess?: () => void
     category?: Category
 }
 
@@ -23,16 +26,17 @@ const emptyForm: CategoryFormData = {
     status: 'Active',
 }
 
-const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) => {
+const CategoryFormModal = ({ open, onClose, onSuccess, category }: CategoryFormModalProps) => {
     const [form, setForm] = useState<CategoryFormData>(emptyForm)
+    const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
         if (category) {
             setForm({
-                name: category.name,
+                name: category.categoryName || category.name || '',
                 slug: category.slug,
-                description: category.description,
-                status: category.status,
+                description: category.description || '',
+                status: category.status || 'Active',
             })
         } else {
             setForm(emptyForm)
@@ -43,10 +47,38 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
         setForm((prev) => ({ ...prev, [field]: value }))
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        // eslint-disable-next-line no-console
-        onClose()
+        setSubmitting(true)
+
+        try {
+            const payload = {
+                categoryName: form.name,
+                slug: form.slug,
+                description: form.description,
+                status: form.status,
+            }
+
+            const response = await createCategoryApi(payload)
+
+            if (response?.statusCode === 200 || response?.statusCode === 201 || response?.es === 0) {
+                toast.success(response?.data?.message || 'Category created successfully')
+                onSuccess?.()
+                onClose()
+            } else {
+                toast.error(response?.data?.message || 'Failed to create category')
+            }
+        } catch (error: any) {
+            console.error('Error creating category:', error)
+            const errorMessage =
+                error?.response?.data?.data?.message ||
+                error?.response?.data?.message ||
+                error?.message ||
+                'Failed to create category'
+            toast.error(errorMessage)
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     const isEdit = !!category
@@ -59,7 +91,7 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
             {open && (
                 <div
                     className="category-form-modal-backdrop fixed inset-0 z-50 bg-black/10 backdrop-blur-sm"
-                    onClick={onClose}
+                    onClick={() => !submitting && onClose()}
                 />
             )}
             <div
@@ -74,7 +106,8 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
                     </h2>
                     <button
                         onClick={onClose}
-                        className="category-form-modal-close-btn flex size-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        disabled={submitting}
+                        className="category-form-modal-close-btn flex size-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:hover:bg-zinc-800"
                     >
                         <X className="category-form-modal-close-icon size-4" />
                     </button>
@@ -96,7 +129,8 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
                                 }
                             }}
                             required
-                            className="category-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
+                            disabled={submitting}
+                            className="category-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
                             placeholder="Electronics"
                         />
                     </div>
@@ -110,7 +144,8 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
                             value={form.slug}
                             onChange={(e) => handleChange('slug', e.target.value)}
                             required
-                            className="category-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
+                            disabled={submitting}
+                            className="category-form-modal-input h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
                             placeholder="electronics"
                         />
                     </div>
@@ -123,7 +158,8 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
                             value={form.description}
                             onChange={(e) => handleChange('description', e.target.value)}
                             rows={3}
-                            className="category-form-modal-textarea w-full resize-none rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
+                            disabled={submitting}
+                            className="category-form-modal-textarea w-full resize-none rounded-lg border border-zinc-200 bg-white/60 px-3 py-2 text-sm outline-none transition-colors focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
                             placeholder="Category description..."
                         />
                     </div>
@@ -134,8 +170,9 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
                         </label>
                         <select
                             value={form.status}
-                            onChange={(e) => handleChange('status', e.target.value)}
-                            className="category-form-modal-select h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
+                            onChange={(e) => handleChange('status', e.target.value as 'Active' | 'Inactive')}
+                            disabled={submitting}
+                            className="category-form-modal-select h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
                         >
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
@@ -146,14 +183,17 @@ const CategoryFormModal = ({ open, onClose, category }: CategoryFormModalProps) 
                         <button
                             type="button"
                             onClick={onClose}
-                            className="category-form-modal-cancel-btn rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-zinc-100/70 hover:text-zinc-800 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
+                            disabled={submitting}
+                            className="category-form-modal-cancel-btn rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 transition-colors hover:bg-zinc-100/70 hover:text-zinc-800 disabled:opacity-50 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="category-form-modal-submit-btn rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
+                            disabled={submitting}
+                            className="category-form-modal-submit-btn inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-800 dark:hover:bg-zinc-300"
                         >
+                            {submitting && <Loader2 className="size-4 animate-spin text-current" />}
                             {isEdit ? 'Save Changes' : 'Create Category'}
                         </button>
                     </div>
