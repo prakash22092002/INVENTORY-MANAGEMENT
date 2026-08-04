@@ -14,12 +14,14 @@ import {
     FolderTree,
     Plus,
     Pencil,
+    Trash2,
     Loader2,
     ChevronLeft,
     ChevronRight,
     ChevronsLeft,
     ChevronsRight,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import type { Category } from '@/types/category'
 import CategoryFormModal from './CategoryFormModal'
 import SearchBar from '@/components/common/SearchBar'
@@ -42,6 +44,10 @@ const Categories = () => {
     const handleEdit = (category: Category) => {
         setEditingCategory(category)
         setModalOpen(true)
+    }
+
+    const handleDelete = (_category: Category) => {
+        toast.success('Product deleted success')
     }
 
     const handleClose = () => {
@@ -155,6 +161,7 @@ const Categories = () => {
                                 <TableHead className="h-9 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Description</TableHead>
                                 <TableHead className="h-9 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Products</TableHead>
                                 <TableHead className="h-9 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                                <TableHead className="h-9 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="categories-table-body">
@@ -211,14 +218,29 @@ const Categories = () => {
                                                     >
                                                         {status}
                                                     </Badge>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="categories-table-cell categories-table-cell--products py-3 text-right text-sm">
+                                                <div className="flex items-center justify-end gap-2">
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation()
                                                             handleEdit(category)
                                                         }}
                                                         className="flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                                                        title="Edit Category"
                                                     >
                                                         <Pencil className="size-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleDelete(category)
+                                                        }}
+                                                        className="flex size-7 items-center justify-center rounded-lg text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                                                        title="Delete Category"
+                                                    >
+                                                        <Trash2 className="size-3.5 text-red-500 dark:text-red-400" />
                                                     </button>
                                                 </div>
                                             </TableCell>
