@@ -22,7 +22,35 @@ export const getAllCategoryRepo = async ({ page = 0, pageSize = 10, search }: { 
 
     const totalPages = Math.ceil(totalDocuments / limitNum);
 
-    return { category, totalDocuments, totalPages, currentPage: pageNum };
+    const categories = await Category.aggregate([
+        {
+            $lookup: {
+                from: "products",
+                localField: "categoryName",
+                foreignField: "category",
+                as: "products"
+            }
+        },
+        {
+            $project: {
+                id: 1,
+                categoryName: 1,
+                slug: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                products: 1,
+                productsCount: { $size: "$products" }
+            }
+        },
+        {
+            $skip: skip
+        },
+        {
+            $limit: limitNum
+        }
+    ])
+
+    return { categories, totalDocuments, totalPages, currentPage: pageNum };
 }
 
 export const getCategoryRepo = async (categoryName?: string, slug?: string) => {
