@@ -166,6 +166,7 @@ const Inventory = () => {
                             <TableRow className="border-zinc-200/50 dark:border-zinc-700/40">
                                 <TableHead className="h-9 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Product</TableHead>
                                 <TableHead className="h-9 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">SKU</TableHead>
+                                <TableHead className="h-9 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Barcode</TableHead>
                                 <TableHead className="h-9 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Category</TableHead>
                                 <TableHead className="h-9 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Price</TableHead>
                                 <TableHead className="h-9 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Stock</TableHead>
@@ -212,6 +213,9 @@ const Inventory = () => {
                                             </TableCell>
                                             <TableCell className="inventory-table-cell inventory-table-cell--sku py-3 text-sm text-muted-foreground">
                                                 {product.sku}
+                                            </TableCell>
+                                            <TableCell className="inventory-table-cell inventory-table-cell--category py-3 text-sm text-muted-foreground">
+                                                {product.barcode || 'N/A'}
                                             </TableCell>
                                             <TableCell className="inventory-table-cell inventory-table-cell--category py-3 text-sm text-muted-foreground">
                                                 {product.category?.categoryName || "N/A"}

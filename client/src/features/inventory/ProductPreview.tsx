@@ -27,6 +27,7 @@ import { getProductByIdApi, deleteProductByIdApi } from '@/services/api/auth'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import type { Product as ModalProduct } from '@/types/inventory'
+import type { Category } from '@/types/category'
 
 export interface ProductPreviewData {
     _id?: string
@@ -34,7 +35,7 @@ export interface ProductPreviewData {
     productName?: string
     name?: string
     sku?: string
-    category?: string
+    category?: Category | string | Record<string, any>
     barcode?: string
     price?: number
     stockQuantity?: number
@@ -46,6 +47,12 @@ export interface ProductPreviewData {
     updatedAt?: string
     createdBy?: string
     updatedBy?: string
+}
+
+const getCategoryName = (category?: Category | string | Record<string, any>): string => {
+    if (!category) return ''
+    if (typeof category === 'string') return category
+    return category.categoryName || category.name || ''
 }
 
 const ProductPreview = () => {
@@ -158,8 +165,6 @@ const ProductPreview = () => {
         createdBy: productPreviewData.createdBy || '',
         updatedBy: productPreviewData.updatedBy || '',
     } : undefined
-
-    console.log(productPreviewData, "this is the product preview data")
 
     if (productPreviewDataLoading) {
         return (
@@ -280,7 +285,7 @@ const ProductPreview = () => {
                         <div>
                             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</p>
                             <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                                {productPreviewData.category || 'Uncategorized'}
+                                {getCategoryName(productPreviewData.category) || 'Uncategorized'}
                             </p>
                         </div>
                     </CardContent>
@@ -327,7 +332,7 @@ const ProductPreview = () => {
                                     Category
                                 </span>
                                 <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                                    {productPreviewData.category || 'N/A'}
+                                    {getCategoryName(productPreviewData.category) || 'N/A'}
                                 </span>
                             </div>
                         </div>

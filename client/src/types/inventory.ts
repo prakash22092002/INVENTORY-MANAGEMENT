@@ -1,9 +1,11 @@
 
+import type { Category } from './category'
+
 export interface Product {
     id: string
     name: string
     sku: string
-    category?: string
+    category?: Category | string | Record<string, any>
     categoryId?: string
     price: number
     stock: number
@@ -15,3 +17,4 @@ export interface Product {
     createdBy?: string
     updatedBy?: string
 }
+
