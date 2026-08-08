@@ -214,7 +214,7 @@ const Inventory = () => {
                                                 {product.sku}
                                             </TableCell>
                                             <TableCell className="inventory-table-cell inventory-table-cell--category py-3 text-sm text-muted-foreground">
-                                                {product.category}
+                                                {product.category?.categoryName || "N/A"}
                                             </TableCell>
                                             <TableCell className="inventory-table-cell inventory-table-cell--price py-3 text-right text-sm font-medium">
                                                 ₹{price.toFixed(2)}
