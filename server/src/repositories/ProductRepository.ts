@@ -37,7 +37,62 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProductRes
         }
         : {};
 
-    const products = await Product.find(filter).skip(skip).limit(limit);
+    const pipelineStages = [
+        {
+            $addFields: {
+                categoryObjectId: {
+                    $convert: {
+                        input: '$categoryId',
+                        to: 'objectId',
+                        onError: null,
+                        onNull: null
+                    }
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'categoryObjectId',
+                foreignField: '_id',
+                as: 'category'
+            }
+        },
+        {
+            $unwind: {
+                path: '$category',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $match: filter
+        },
+        {
+            $project: {
+                _id: 1,
+                productName: 1,
+                sku: 1,
+                categoryId: 1,
+                category: 1,
+                barcode: 1,
+                price: 1,
+                stockQuantity: 1,
+                description: 1,
+                createdBy: 1,
+                updatedBy: 1,
+                createdAt: 1,
+                updatedAt: 1
+            }
+        },
+        {
+            $skip: skip
+        },
+        {
+            $limit: limit
+        }
+    ];
+
+    const products = await Product.aggregate(pipelineStages);
     const total = await Product.countDocuments(filter);
 
     return {

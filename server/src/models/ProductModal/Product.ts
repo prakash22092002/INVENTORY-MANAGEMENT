@@ -21,6 +21,14 @@ export interface IProduct extends Document {
     productName: string,
     sku: string,
     categoryId: string,
+    category: {
+        _id: string,
+        categoryName: string,
+        slug?: string,
+        description?: string,
+        createdAt?: string,
+        updatedAt?: string
+    },
     barcode: string,
     price: number,
     stockQuantity: number,
