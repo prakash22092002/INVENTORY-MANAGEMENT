@@ -35,7 +35,8 @@ export const getAllCategoryRepo = async ({ page = 0, pageSize = 10, search }: { 
                 createdAt: 1,
                 updatedAt: 1,
                 products: 1,
-                productsCount: { $size: "$products" }
+                productsCount: { $size: "$products" },
+                description: 1
             }
         },
         {
@@ -49,8 +50,8 @@ export const getAllCategoryRepo = async ({ page = 0, pageSize = 10, search }: { 
     return { categories, totalDocuments, totalPages, currentPage: pageNum };
 }
 
-export const getCategoryRepo = async (categoryName?: string, slug?: string) => {
-    const category = await Category.findOne({ categoryName, slug });
+export const getCategoryRepo = async (categoryData: categoryData) => {
+    const category = await Category.findOne({ categoryName: categoryData.categoryName, slug: categoryData.slug });
     return category;
 }
 
@@ -81,5 +82,18 @@ export const deleteCategoryRepo = async (categoryId: string) => {
     }
 
     return categoryToDelete;
+
+}
+
+export const editCategoryRepo = async (categoryData: categoryData) => {
+    const { _id } = categoryData;
+
+    const category = await Category.findByIdAndUpdate(_id, categoryData, { new: true });
+
+    if (!category) {
+        throw new Error("Category not found")
+    }
+
+    return category;
 
 }

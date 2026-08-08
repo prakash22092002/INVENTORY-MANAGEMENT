@@ -3,6 +3,7 @@ import addCategoryService from "../../services/categoryService/addCategoryServic
 import { getCategoryService } from "../../services/categoryService/getCategoryService";
 import { sendErrorResponse, sendSuccessResponse } from "../../utils/responseHelper";
 import { deleteCategoryService } from "../../services/categoryService/deleteCategoryService";
+import editCategoryService from "../../services/categoryService/editCategoryService";
 
 export const addCategoryController = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -35,6 +36,16 @@ export const deleteCategoryController = async (req: Request, res: Response, next
     }
     catch (error) {
         const message = error instanceof Error ? error.message : "Failed to delete category";
+        sendErrorResponse(res, 400, message);
+    }
+}
+
+export const editCategoryController = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const category = await editCategoryService(req.body)
+        sendSuccessResponse(res, 200, "Category updated successfully", { category });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to update category";
         sendErrorResponse(res, 400, message);
     }
 }

@@ -1,9 +1,14 @@
 import { Document, model, Schema } from "mongoose";
 
 export interface categoryData {
+    _id?: string;
     categoryName: string;
     slug: string;
     description?: string;
+    products?: string[];
+    productsCount?: number,
+    createdAt?: string,
+    updatedAt?: string
 }
 
 export interface Icategory extends Document {
@@ -30,7 +35,11 @@ const CategorySchema = new Schema<Icategory>(
         }
     },
     {
-        timestamps: true,
+        timestamps: {
+            createdAt: true,
+            updatedAt: true,
+            currentTime: () => Date.now()
+        },
         versionKey: false
     }
 )
