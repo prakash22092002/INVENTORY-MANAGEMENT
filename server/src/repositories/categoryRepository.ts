@@ -22,8 +22,8 @@ export const getAllCategoryRepo = async ({ page = 0, pageSize = 10, search }: { 
         {
             $lookup: {
                 from: "products",
-                localField: "categoryName",
-                foreignField: "category",
+                localField: "_id",
+                foreignField: "categoryId",
                 as: "products"
             }
         },
