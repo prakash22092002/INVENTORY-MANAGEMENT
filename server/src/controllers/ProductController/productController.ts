@@ -10,8 +10,8 @@ import { deleteProductService } from "../../services/productService/deleteProduc
 
 export const addProductController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy } = req.body;
-        const product = await addProductService({ productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy });
+        const { productName, sku, categoryId, barcode, price, stockQuantity, description, createdBy, updatedBy } = req.body;
+        const product = await addProductService({ productName, sku, categoryId, barcode, price, stockQuantity, description, createdBy, updatedBy });
         sendSuccessResponse(res, 201, 'Product added successfully', {
             product
         });

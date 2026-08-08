@@ -5,13 +5,13 @@ import { Request, Response, NextFunction } from "express";
 import { sendErrorResponse } from "../../utils/responseHelper";
 
 const editProductValidation = (req: Request, res: Response, next: NextFunction) => {
-    const { productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy } = req.body;
+    const { productName, sku, categoryId, barcode, price, stockQuantity, description, createdBy, updatedBy } = req.body;
     if (!productName || typeof productName !== 'string' || productName.length < 3 || productName.length > 100) {
         sendErrorResponse(res, 400, "Please provide a valid name");
         return;
     }
 
-    if (!category || typeof category !== 'string') {
+    if (!categoryId || typeof categoryId !== 'string') {
         sendErrorResponse(res, 400, "Please provide a valid category");
         return;
     }

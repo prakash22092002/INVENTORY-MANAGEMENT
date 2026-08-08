@@ -20,7 +20,7 @@ export interface IProductResponse {
 export interface IProduct extends Document {
     productName: string,
     sku: string,
-    category: string,
+    categoryId: string,
     barcode: string,
     price: number,
     stockQuantity: number,
@@ -43,7 +43,7 @@ const ProductSchema = new Schema<IProduct>(
             required: [true, 'SKU is required'],
             trim: true
         },
-        category: {
+        categoryId: {
             type: String,
             required: [true, 'Category is required'],
             trim: true

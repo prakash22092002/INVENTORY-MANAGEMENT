@@ -17,10 +17,14 @@ export interface CreateCategoryPayload {
 }
 
 export interface EditCategoryPayload {
-    categoryId: string,
+    _id: string,
     categoryName?: string,
     slug?: string,
     description?: string,
+    productCount?: number,
+    products?: string[],
+    createdAt?: string,
+    updatedAt?: string
 }
 
 export interface getCategoryPayload {

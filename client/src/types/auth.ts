@@ -29,7 +29,7 @@ export interface GetAllPaymentPayload {
 export interface CreateProductPayload {
     productName: string,
     sku: string,
-    category: string,
+    categoryId: string,
     barcode: string,
     price: number,
     stockQuantity: number,
@@ -42,7 +42,7 @@ export interface EditProductPayload {
     productId: string,
     productName: string,
     sku: string,
-    category: string,
+    categoryId: string,
     barcode: string,
     price: number,
     stockQuantity: number,

@@ -12,7 +12,7 @@ import CustomSelectInput from '@/components/common/CustomSelectInput'
 type ProductFormData = {
     name: string
     sku: string
-    category: string
+    categoryId: string
     price: string
     stock: string
     barcode: string
@@ -29,7 +29,7 @@ type ProductFormModalProps = {
 const emptyForm: ProductFormData = {
     name: '',
     sku: '',
-    category: '',
+    categoryId: '',
     price: '',
     stock: '',
     barcode: '',
@@ -52,7 +52,7 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
             setForm({
                 name: product.name,
                 sku: product.sku,
-                category: product.category,
+                categoryId: product.categoryId || '',
                 price: product.price.toString(),
                 stock: product.stock.toString(),
                 barcode: product.barcode.toString(),
@@ -115,7 +115,7 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
                     productId: product?.id,
                     productName: form.name,
                     sku: form.sku,
-                    category: form.category,
+                    categoryId: form.categoryId,
                     barcode: form.barcode,
                     price: parseFloat(form.price),
                     stockQuantity: parseInt(form.stock),
@@ -138,7 +138,7 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
                 const formData: CreateProductPayload = {
                     productName: form.name,
                     sku: form.sku,
-                    category: form.category,
+                    categoryId: form.categoryId,
                     barcode: form.barcode,
                     price: parseFloat(form.price),
                     stockQuantity: parseInt(form.stock),
@@ -237,8 +237,8 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
                                 Category
                             </label>
                             <CustomSelectInput
-                                value={form.category}
-                                onChange={(val) => handleChange('category', val)}
+                                value={form.categoryId}
+                                onChange={(val) => handleChange('categoryId', val)}
                                 options={categoryOptions}
                                 onActive={fetchCategories}
                                 loading={categoriesLoading}

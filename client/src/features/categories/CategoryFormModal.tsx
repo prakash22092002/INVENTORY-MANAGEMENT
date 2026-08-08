@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Category } from '@/types/category'
-import { createCategoryApi } from '@/services/api/auth'
+import { createCategoryApi, editCategoryApi } from '@/services/api/auth'
 import { toast } from 'sonner'
 
 type CategoryFormData = {
@@ -52,14 +52,28 @@ const CategoryFormModal = ({ open, onClose, onSuccess, category }: CategoryFormM
         setSubmitting(true)
 
         try {
-            const payload = {
-                categoryName: form.name,
-                slug: form.slug,
-                description: form.description,
-                status: form.status,
-            }
 
-            const response = await createCategoryApi(payload)
+            let response
+
+            if (isEdit) {
+                const categoryId = category?._id || category?.id || ''
+                const editCategoryPayload = {
+                    _id: categoryId,
+                    categoryName: form.name,
+                    slug: form.slug,
+                    description: form.description,
+                    status: form.status,
+                }
+                response = await editCategoryApi(editCategoryPayload)
+            } else {
+                const createCategoryPayload = {
+                    categoryName: form.name,
+                    slug: form.slug,
+                    description: form.description,
+                    status: form.status,
+                }
+                response = await createCategoryApi(createCategoryPayload)
+            }
 
             if (response?.statusCode === 200 || response?.statusCode === 201 || response?.es === 0) {
                 toast.success(response?.data?.message || 'Category created successfully')

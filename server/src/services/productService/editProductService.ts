@@ -4,7 +4,7 @@ import { sendErrorResponse } from "../../utils/responseHelper"
 
 const editProductService = async (productData: any) => {
     try {
-        const { productId, productName, sku, category, barcode, price, stockQuantity, description, createdBy, updatedBy } = productData;
+        const { productId, productName, sku, categoryId, barcode, price, stockQuantity, description, createdBy, updatedBy } = productData;
 
         if (!productId || typeof productId !== 'string') {
             throw new Error("Invalid product ID");
@@ -14,7 +14,7 @@ const editProductService = async (productData: any) => {
             throw new Error("Please provide a valid name");
         }
 
-        if (!category || typeof category !== 'string') {
+        if (!categoryId || typeof categoryId !== 'string') {
             throw new Error("Please provide a valid category");
         }
 
@@ -46,7 +46,7 @@ const editProductService = async (productData: any) => {
             productId,
             productName,
             sku,
-            category,
+            categoryId,
             barcode,
             price,
             stockQuantity,
@@ -61,7 +61,7 @@ const editProductService = async (productData: any) => {
         const updateProduct = await Product.findByIdAndUpdate(productId, {
             productName,
             sku,
-            category,
+            categoryId,
             barcode,
             price,
             stockQuantity,
