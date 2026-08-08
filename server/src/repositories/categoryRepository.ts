@@ -13,10 +13,6 @@ export const getAllCategoryRepo = async ({ page = 0, pageSize = 10, search }: { 
     const limitNum = Number(pageSize) || 10;
     const skip = pageNum * limitNum;
 
-    const category = await Category.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limitNum);
 
     const totalDocuments = await Category.countDocuments(query);
 

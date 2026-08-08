@@ -5,7 +5,7 @@ export interface Category {
     categoryName?: string
     slug: string
     description?: string
-    productCount?: number
+    productsCount?: number
     status?: 'Active' | 'Inactive'
     createdAt?: string
 }

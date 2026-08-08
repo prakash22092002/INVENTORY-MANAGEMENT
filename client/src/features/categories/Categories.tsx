@@ -69,18 +69,16 @@ const Categories = () => {
             })
 
             const categoryData = response?.data?.category
+
             if (categoryData) {
-                const list = categoryData.category || []
-                const totalDoc = categoryData.totalDocuments ?? list.length
-                const pages = categoryData.totalPages || Math.ceil(totalDoc / size) || 1
+                const list = categoryData?.categories || []
+                const totalDoc = categoryData?.totalDocuments ?? list?.length
+                const pages = categoryData?.totalPages || Math.ceil(totalDoc / size) || 1
 
                 setCategories(list)
                 setTotalCategories(totalDoc)
                 setTotalPages(pages)
-            } else if (Array.isArray(response?.data)) {
-                setCategories(response.data)
-                setTotalCategories(response.data.length)
-                setTotalPages(Math.ceil(response.data.length / size) || 1)
+
             } else {
                 setCategories([])
                 setTotalCategories(0)
@@ -185,7 +183,7 @@ const Categories = () => {
                                     const name = category.categoryName || category.name || 'Unnamed Category'
                                     const key = category._id || category.id || index
                                     const status = category.status || 'Active'
-                                    const productCount = category.productCount ?? 0
+                                    const productCount = category.productsCount ?? 0
 
                                     return (
                                         <TableRow
