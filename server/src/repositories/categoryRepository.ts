@@ -65,3 +65,21 @@ export const addCategoryRepo = async (categoryData: categoryData) => {
     const saveCategory = await category.save();
     return saveCategory;
 }
+
+
+export const deleteCategoryRepo = async (categoryId: string) => {
+    const categoryPresent = await Category.findById(categoryId);
+
+    if (!categoryPresent) {
+        throw new Error("Category not found");
+    }
+
+    const categoryToDelete = await Category.findByIdAndDelete(categoryId);
+
+    if (!categoryToDelete) {
+        throw new Error("Failed to delete category");
+    }
+
+    return categoryToDelete;
+
+}

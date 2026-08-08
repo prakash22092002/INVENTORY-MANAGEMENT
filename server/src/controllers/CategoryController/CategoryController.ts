@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import addCategoryService from "../../services/categoryService/addCategoryService";
 import { getCategoryService } from "../../services/categoryService/getCategoryService";
 import { sendErrorResponse, sendSuccessResponse } from "../../utils/responseHelper";
+import { deleteCategoryService } from "../../services/categoryService/deleteCategoryService";
 
 export const addCategoryController = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -22,3 +23,18 @@ export const getCategoryController = async (req: Request, res: Response, next: N
         sendErrorResponse(res, 400, message);
     }
 };
+
+export const deleteCategoryController = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+        const { categoryId } = req.params as { categoryId: string }
+
+        const category = await deleteCategoryService(categoryId)
+        sendSuccessResponse(res, 200, "Category deleted successfully", { category });
+
+    }
+    catch (error) {
+        const message = error instanceof Error ? error.message : "Failed to delete category";
+        sendErrorResponse(res, 400, message);
+    }
+}
