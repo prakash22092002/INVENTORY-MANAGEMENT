@@ -80,10 +80,7 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
             }
             const response = await getAllCategoriesApi(payload)
 
-            const rawList =
-                response?.data?.category?.category ||
-                response?.data?.category ||
-                (Array.isArray(response?.data) ? response?.data : [])
+            const rawList = response?.data?.category?.categories || []
 
             const names: string[] = rawList
                 .map((item: any) =>
