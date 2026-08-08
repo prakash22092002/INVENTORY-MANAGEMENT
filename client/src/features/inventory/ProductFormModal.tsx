@@ -41,7 +41,7 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
     const [formLoader, setFormLoader] = useState<boolean>(false)
 
     // Category options state
-    const [categoryOptions, setCategoryOptions] = useState<string[]>([])
+    const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([])
     const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false)
     const [categoriesFetched, setCategoriesFetched] = useState<boolean>(false)
 
@@ -52,7 +52,7 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
             setForm({
                 name: product.name,
                 sku: product.sku,
-                categoryId: product.categoryId || '',
+                categoryId: product.categoryId || (typeof product.category === 'string' ? product.category : (product.category as any)?._id || ''),
                 price: product.price.toString(),
                 stock: product.stock.toString(),
                 barcode: product.barcode.toString(),
@@ -64,7 +64,9 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
     }, [product, open])
 
     useEffect(() => {
-        if (!open) {
+        if (open) {
+            fetchCategories()
+        } else {
             setCategoriesFetched(false)
             setCategoryOptions([])
         }
@@ -82,13 +84,14 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
 
             const rawList = response?.data?.category?.categories || []
 
-            const names: string[] = rawList
-                .map((item: any) =>
-                    typeof item === 'string' ? item : item?.categoryName || ''
-                )
-                .filter(Boolean)
+            const options: { label: string; value: string }[] = rawList
+                .map((item: any) => ({
+                    label: typeof item === 'string' ? item : (item?.categoryName || item?.name || ''),
+                    value: typeof item === 'string' ? item : (item?._id || item?.id || ''),
+                }))
+                .filter((opt: { label: string; value: string }) => Boolean(opt.label && opt.value))
 
-            setCategoryOptions(names)
+            setCategoryOptions(options)
             setCategoriesFetched(true)
         } catch (err) {
             console.error('Failed to fetch categories:', err)
