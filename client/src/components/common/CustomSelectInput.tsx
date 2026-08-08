@@ -1,38 +1,49 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChevronDown, Loader2, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { getAllCategoriesApi } from '@/services/api/auth'
-import type { getCategoryPayload } from '@/types/category'
 
-interface CustomSelectInputProps {
+export type SelectOption = string | { label: string; value: string }
+
+export interface CustomSelectInputProps {
     value: string
     onChange: (value: string) => void
+    options?: SelectOption[]
+    onActive?: () => void
+    onFocus?: () => void
+    loading?: boolean
     placeholder?: string
     disabled?: boolean
     className?: string
-    onFetchOptions?: () => Promise<string[]>
 }
 
 const CustomSelectInput = ({
     value,
     onChange,
+    options = [],
+    onActive,
+    onFocus,
+    loading = false,
     placeholder = 'Select or search...',
     disabled = false,
     className,
-    onFetchOptions,
 }: CustomSelectInputProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState(value || '')
-    const [options, setOptions] = useState<string[]>([])
-    const [loading, setLoading] = useState(false)
-    const [hasFetched, setHasFetched] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // Keep internal search term in sync when external value prop changes
+    // Normalize string[] or { label, value }[] options
+    const normalizedOptions = options.map((opt) =>
+        typeof opt === 'string' ? { label: opt, value: opt } : opt
+    )
+
+    // Sync input text with value prop
     useEffect(() => {
-        setSearchTerm(value || '')
-    }, [value])
+        const selectedOpt = normalizedOptions.find(
+            (opt) => opt.value.toLowerCase() === (value || '').toLowerCase()
+        )
+        setSearchTerm(selectedOpt ? selectedOpt.label : value || '')
+    }, [value, options])
 
     // Close dropdown on click outside
     useEffect(() => {
@@ -45,51 +56,17 @@ const CustomSelectInput = ({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    const fetchOptionsData = async () => {
-        if (loading || hasFetched) return
-        setLoading(true)
-        try {
-            if (onFetchOptions) {
-                const customList = await onFetchOptions()
-                setOptions(customList)
-            } else {
-                const payload: getCategoryPayload = {
-                    page: 0,
-                    pageSize: 100,
-                }
-                const response = await getAllCategoriesApi(payload)
-
-                const rawList =
-                    response?.data?.category?.category ||
-                    response?.data?.category ||
-                    (Array.isArray(response?.data) ? response?.data : [])
-
-                const names: string[] = rawList
-                    .map((item: any) =>
-                        typeof item === 'string' ? item : item.categoryName || item.name || item.slug || ''
-                    )
-                    .filter(Boolean)
-
-                setOptions(names)
-            }
-            setHasFetched(true)
-        } catch (error) {
-            console.error('Failed to fetch options:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const handleFocus = () => {
+    const handleActive = () => {
         if (!disabled) {
             setIsOpen(true)
-            fetchOptionsData()
+            onFocus?.()
+            onActive?.()
         }
     }
 
-    const handleSelectOption = (optionValue: string) => {
-        setSearchTerm(optionValue)
-        onChange(optionValue)
+    const handleSelectOption = (opt: { label: string; value: string }) => {
+        setSearchTerm(opt.label)
+        onChange(opt.value)
         setIsOpen(false)
     }
 
@@ -100,8 +77,10 @@ const CustomSelectInput = ({
         if (!isOpen) setIsOpen(true)
     }
 
-    const filteredOptions = options.filter((opt) =>
-        opt.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredOptions = normalizedOptions.filter(
+        (opt) =>
+            opt.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            opt.value.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
     return (
@@ -111,8 +90,8 @@ const CustomSelectInput = ({
                     ref={inputRef}
                     type="text"
                     value={searchTerm}
-                    onFocus={handleFocus}
-                    onClick={handleFocus}
+                    onFocus={handleActive}
+                    onClick={handleActive}
                     onChange={handleInputChange}
                     placeholder={placeholder}
                     disabled={disabled}
@@ -128,7 +107,7 @@ const CustomSelectInput = ({
                             onClick={() => {
                                 if (!disabled) {
                                     setIsOpen((prev) => !prev)
-                                    if (!isOpen) handleFocus()
+                                    if (!isOpen) handleActive()
                                 }
                             }}
                             className="flex size-5 items-center justify-center rounded hover:text-zinc-600 dark:hover:text-zinc-300"
@@ -154,10 +133,10 @@ const CustomSelectInput = ({
                         </div>
                     ) : (
                         filteredOptions.map((opt) => {
-                            const isSelected = opt.toLowerCase() === value.toLowerCase()
+                            const isSelected = opt.value.toLowerCase() === value.toLowerCase()
                             return (
                                 <button
-                                    key={opt}
+                                    key={opt.value}
                                     type="button"
                                     onClick={() => handleSelectOption(opt)}
                                     className={cn(
@@ -166,7 +145,7 @@ const CustomSelectInput = ({
                                             'bg-zinc-100/70 font-medium text-zinc-900 dark:bg-zinc-800/70 dark:text-zinc-100'
                                     )}
                                 >
-                                    <span>{opt}</span>
+                                    <span>{opt.label}</span>
                                     {isSelected && <Check className="size-4 text-zinc-600 dark:text-zinc-300" />}
                                 </button>
                             )

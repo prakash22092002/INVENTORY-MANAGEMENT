@@ -4,7 +4,8 @@ import { cn } from '@/lib/utils'
 import type { Product } from '@/types/inventory'
 import type { CreateProductPayload, EditProductPayload } from '@/types/auth'
 import { toast } from 'sonner'
-import { createProductApi, editProductApi } from '@/services/api/auth'
+import { createProductApi, editProductApi, getAllCategoriesApi } from '@/services/api/auth'
+import type { getCategoryPayload } from '@/types/category'
 import CustomSelectInput from '@/components/common/CustomSelectInput'
 
 
@@ -39,6 +40,11 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
     const [form, setForm] = useState<ProductFormData>(emptyForm)
     const [formLoader, setFormLoader] = useState<boolean>(false)
 
+    // Category options state
+    const [categoryOptions, setCategoryOptions] = useState<string[]>([])
+    const [categoriesLoading, setCategoriesLoading] = useState<boolean>(false)
+    const [categoriesFetched, setCategoriesFetched] = useState<boolean>(false)
+
     const updatedBy = localStorage.getItem('userName');
 
     useEffect(() => {
@@ -56,6 +62,44 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
             setForm(emptyForm)
         }
     }, [product, open])
+
+    useEffect(() => {
+        if (!open) {
+            setCategoriesFetched(false)
+            setCategoryOptions([])
+        }
+    }, [open])
+
+    const fetchCategories = async () => {
+        if (categoriesLoading || categoriesFetched) return
+        setCategoriesLoading(true)
+        try {
+            const payload: getCategoryPayload = {
+                page: 0,
+                pageSize: 100,
+            }
+            const response = await getAllCategoriesApi(payload)
+
+            const rawList =
+                response?.data?.category?.category ||
+                response?.data?.category ||
+                (Array.isArray(response?.data) ? response?.data : [])
+
+            const names: string[] = rawList
+                .map((item: any) =>
+                    typeof item === 'string' ? item : item.categoryName || item.name || item.slug || ''
+                )
+                .filter(Boolean)
+
+            setCategoryOptions(names)
+            setCategoriesFetched(true)
+        } catch (err) {
+            console.error('Failed to fetch categories:', err)
+            toast.error('Failed to fetch categories')
+        } finally {
+            setCategoriesLoading(false)
+        }
+    }
 
     const handleChange = (field: keyof ProductFormData, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }))
@@ -198,6 +242,9 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
                             <CustomSelectInput
                                 value={form.category}
                                 onChange={(val) => handleChange('category', val)}
+                                options={categoryOptions}
+                                onActive={fetchCategories}
+                                loading={categoriesLoading}
                                 placeholder="Select or search category..."
                             />
                         </div>
