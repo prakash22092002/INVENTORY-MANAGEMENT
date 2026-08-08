@@ -72,7 +72,7 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProductRes
                 _id: 1,
                 productName: 1,
                 sku: 1,
-                categoryId: 1,
+                // categoryId: 1,
                 category: 1,
                 barcode: 1,
                 price: 1,
