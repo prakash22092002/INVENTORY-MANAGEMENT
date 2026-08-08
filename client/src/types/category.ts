@@ -24,7 +24,7 @@ export interface EditCategoryPayload {
 }
 
 export interface getCategoryPayload {
-    page: number;
-    pageSize: number;
+    page?: number;
+    pageSize?: number;
     search?: string;
 }

@@ -5,8 +5,8 @@ import type { Product } from '@/types/inventory'
 import type { CreateProductPayload, EditProductPayload } from '@/types/auth'
 import { toast } from 'sonner'
 import { createProductApi, editProductApi } from '@/services/api/auth'
+import CustomSelectInput from '@/components/common/CustomSelectInput'
 
-const categories = ['Oil', 'Powder', 'Fruits', 'Vegetables']
 
 type ProductFormData = {
     name: string
@@ -28,7 +28,7 @@ type ProductFormModalProps = {
 const emptyForm: ProductFormData = {
     name: '',
     sku: '',
-    category: 'Oil',
+    category: '',
     price: '',
     stock: '',
     barcode: '',
@@ -40,7 +40,6 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
     const [formLoader, setFormLoader] = useState<boolean>(false)
 
     const updatedBy = localStorage.getItem('userName');
-
 
     useEffect(() => {
         if (product) {
@@ -134,6 +133,8 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
 
     }
 
+
+
     const isEdit = !!product
 
     return (
@@ -194,15 +195,11 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
                             <label className="product-form-modal-field-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                                 Category
                             </label>
-                            <select
+                            <CustomSelectInput
                                 value={form.category}
-                                onChange={(e) => handleChange('category', e.target.value)}
-                                className="product-form-modal-select h-9 w-full rounded-lg border border-zinc-200 bg-white/60 px-3 text-sm outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/60 dark:focus:border-zinc-500"
-                            >
-                                {categories.map((cat) => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
+                                onChange={(val) => handleChange('category', val)}
+                                placeholder="Select or search category..."
+                            />
                         </div>
                         <div className="product-form-modal-field">
                             <label className="product-form-modal-field-label text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
