@@ -1,7 +1,7 @@
 
 
 
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Types } from "mongoose";
 
 
 export interface IProductQuery {
@@ -20,7 +20,7 @@ export interface IProductResponse {
 export interface IProduct extends Document {
     productName: string,
     sku: string,
-    categoryId: string,
+    categoryId: Types.ObjectId | string,
     category: {
         _id: string,
         categoryName: string,
@@ -52,9 +52,9 @@ const ProductSchema = new Schema<IProduct>(
             trim: true
         },
         categoryId: {
-            type: String,
-            required: [true, 'Category is required'],
-            trim: true
+            type: Schema.Types.ObjectId,
+            ref: 'Category',
+            required: [true, 'Category is required']
         },
         barcode: {
             type: String,

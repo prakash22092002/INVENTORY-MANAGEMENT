@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { IProduct, IProductQuery, IProductResponse, Product } from "../models/ProductModal/Product";
 
 /**
@@ -39,21 +40,9 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProductRes
 
     const pipelineStages = [
         {
-            $addFields: {
-                categoryObjectId: {
-                    $convert: {
-                        input: '$categoryId',
-                        to: 'objectId',
-                        onError: null,
-                        onNull: null
-                    }
-                }
-            }
-        },
-        {
             $lookup: {
                 from: 'categories',
-                localField: 'categoryObjectId',
+                localField: 'categoryId',
                 foreignField: '_id',
                 as: 'category'
             }
@@ -72,7 +61,7 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProductRes
                 _id: 1,
                 productName: 1,
                 sku: 1,
-                // categoryId: 1,
+                categoryId: 1,
                 category: 1,
                 barcode: 1,
                 price: 1,
@@ -105,10 +94,13 @@ export const getProductsRepo = async (query: IProductQuery): Promise<IProductRes
 }
 
 export const editProductRepo = async (productId: string, data: Partial<IProduct>): Promise<IProduct | null> => {
-    const product = await Product.findById(productId)
+    const product = await Product.findById(productId);
+
     if (!product) {
-        return null
+        return null;
     }
+
+    Object.assign(product, data);
 
     if (data.stockQuantity && data.stockQuantity > 20) {
         product.stockAlert = "in_stock";
@@ -124,11 +116,48 @@ export const editProductRepo = async (productId: string, data: Partial<IProduct>
 
 export const getProductByIdRepo = async (productId: string): Promise<IProduct | null> => {
 
-    const product = await Product.findById(productId);
+    const productCategoryData = await Product.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(productId)
+            }
+        },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'categoryId',
+                foreignField: '_id',
+                as: 'category'
+            }
+        },
+        {
+            $unwind: {
+                path: '$category',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                productName: 1,
+                sku: 1,
+                // categoryId: 1,   
+                category: 1,
+                barcode: 1,
+                price: 1,
+                stockQuantity: 1,
+                description: 1,
+                createdBy: 1,
+                updatedBy: 1,
+                createdAt: 1,
+                updatedAt: 1
+            }
+        }
+    ]);
 
-    if (!product) {
+    if (!productCategoryData || productCategoryData.length === 0) {
         return null;
     }
 
-    return product;
+    return productCategoryData[0];
 }
