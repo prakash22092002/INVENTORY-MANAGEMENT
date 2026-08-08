@@ -87,7 +87,7 @@ const ProductFormModal = ({ open, onClose, product, onSuccess }: ProductFormModa
 
             const names: string[] = rawList
                 .map((item: any) =>
-                    typeof item === 'string' ? item : item.categoryName || item.name || item.slug || ''
+                    typeof item === 'string' ? item : item?.categoryName || ''
                 )
                 .filter(Boolean)
 
