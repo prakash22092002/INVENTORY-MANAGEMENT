@@ -73,3 +73,7 @@ export const createCategoryApi = async (payload: CreateCategoryPayload) => {
     return response.data;
 }
 
+export const deleteCategoryApi = async (categoryId: string) => {
+    const response = await api.delete(`/api/category/delete/${categoryId}`);
+    return response.data;
+}

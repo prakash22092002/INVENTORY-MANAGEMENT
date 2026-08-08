@@ -25,7 +25,7 @@ import { toast } from 'sonner'
 import type { Category } from '@/types/category'
 import CategoryFormModal from './CategoryFormModal'
 import SearchBar from '@/components/common/SearchBar'
-import { getAllCategoriesApi } from '@/services/api/auth'
+import { deleteCategoryApi, getAllCategoriesApi } from '@/services/api/auth'
 
 const Categories = () => {
     const navigate = useNavigate()
@@ -41,13 +41,39 @@ const Categories = () => {
     const [totalPages, setTotalPages] = useState(1)
     const [searchQuery, setSearchQuery] = useState('')
 
+    // delete
+    const [deleteCategories, setDeleteCategories] = useState<boolean>(false)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+
     const handleEdit = (category: Category) => {
         setEditingCategory(category)
         setModalOpen(true)
     }
 
-    const handleDelete = (_category: Category) => {
-        toast.success('Product deleted success')
+    const handleDelete = async (_category: Category) => {
+        const catId = _category._id || _category.id
+        if (!catId) return
+
+        setDeleteCategories(true)
+        setDeletingId(catId)
+
+        try {
+            const response = await deleteCategoryApi(catId)
+
+            if (response?.es === 0 || response?.statusCode === 200) {
+                toast.success(response?.data?.message || 'Category deleted successfully')
+                fetchCategories(currentPage, pageSize, searchQuery)
+            } else {
+                toast.error(response?.data?.message || 'Failed to delete category')
+            }
+        } catch (err: any) {
+            console.error('Error deleting category:', err)
+            const errorMsg = err?.response?.data?.data?.message || err?.message || 'Failed to delete category'
+            toast.error(errorMsg)
+        } finally {
+            setDeleteCategories(false)
+            setDeletingId(null)
+        }
     }
 
     const handleClose = () => {
@@ -235,10 +261,15 @@ const Categories = () => {
                                                             e.stopPropagation()
                                                             handleDelete(category)
                                                         }}
-                                                        className="flex size-7 items-center justify-center rounded-lg text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                                                        disabled={Boolean(deleteCategories && deletingId === (category._id || category.id))}
+                                                        className="flex size-7 items-center justify-center rounded-lg text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/40 dark:hover:text-red-300"
                                                         title="Delete Category"
                                                     >
-                                                        <Trash2 className="size-3.5 text-red-500 dark:text-red-400" />
+                                                        {deleteCategories && deletingId === (category._id || category.id) ? (
+                                                            <Loader2 className="size-3.5 animate-spin text-red-500 dark:text-red-400" />
+                                                        ) : (
+                                                            <Trash2 className="size-3.5 text-red-500 dark:text-red-400" />
+                                                        )}
                                                     </button>
                                                 </div>
                                             </TableCell>
